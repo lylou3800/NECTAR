@@ -83,15 +83,12 @@ void screen_drink_detail_create(lv_obj_t *screen)
     lv_obj_set_style_bg_color(hero, ui_color_surface_alt(), 0);
     lv_obj_set_style_bg_grad_color(hero, ui_color_surface_highlight(), 0);
 
-    title = lv_label_create(hero);
-    lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "À DÉCOUVRIR");
-    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
-
+    /* Statut seul, centré en haut du hero (libellé "À DÉCOUVRIR" retiré : il
+     * chevauchait le badge sur la largeur étroite du hero). */
     badge = lv_label_create(hero);
     lv_obj_add_style(badge, recipe->stock_percent <= 35U ? ui_style_badge_alert() : ui_style_badge(), 0);
-    lv_label_set_text(badge, recipe->stock_percent <= 35U ? "BIENTÔT ÉPUISÉ" : "PRÊT");
-    lv_obj_align(badge, LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_label_set_text(badge, recipe->stock_percent <= 35U ? "Bientôt épuisé" : "Disponible");
+    lv_obj_align(badge, LV_ALIGN_TOP_MID, 0, 0);
 
     /* Colonne centrale du hero: halo + mL + allergènes, sans positionnement absolu fragile */
     container = lv_obj_create(hero);
