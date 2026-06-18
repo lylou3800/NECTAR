@@ -6,9 +6,9 @@ mkdir -p "$OUT"
 
 gen() { # nom_fichier  fichier_ttf  taille
   lv_font_conv --font "$TTF_DIR/$2" --size "$3" --bpp 4 --format lvgl --no-compress \
-    -r 0x20-0x7F -r 0xA0-0xFF -r 0x152-0x153 --symbols $’’…’ \
+    -r 0x20-0x7F -r 0xA0-0xFF -r 0x152-0x153 --symbols '’…' \
     -o "$OUT/$1.c" --force-fast-kern-format
-  sed -i ‘s#"lvgl/lvgl.h"#"lvgl.h"#’ "$OUT/$1.c"
+  sed -i 's#"lvgl/lvgl.h"#"lvgl.h"#' "$OUT/$1.c"
 }
 
 # Baloo 2 : police "display". Pour une vraie graisse ExtraBold, pre-instancier
