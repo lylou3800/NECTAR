@@ -24,12 +24,11 @@ static const char *TAG = "nectar_board";
 
 /* Registre de sortie du CH422G (adresse 0x38) — un bit par EXIO :
  *   EXIO1=TP_RST, EXIO2=LCD_BL, EXIO3=LCD_RST, EXIO4=SD_CS, EXIO5=USB_SEL.
- *   EXIO0 / 6 / 7 sont LIBRES -> on utilise EXIO0 (bit 0) comme sortie POMPE.
  * Base = TP_RST|LCD_RST|SD_CS maintenus hauts (0x1A) ; le rétroéclairage (bit 2)
- * et la pompe (bit 0) sont gérés dynamiquement via un registre "shadow". */
+ * est géré dynamiquement via un registre "shadow".
+ * (La pompe est pilotée ailleurs : TCA9548A via gpio.c sur le bus I2C partagé.) */
 #define NECTAR_CH422G_BASE 0x1A
 #define NECTAR_CH422G_BIT_BACKLIGHT (1u << 2)
-#define NECTAR_CH422G_BIT_PUMP (1u << 0)
 
 #define NECTAR_LCD_PIXEL_CLOCK_HZ (16 * 1000 * 1000)
 
@@ -277,29 +276,9 @@ void board_display_backlight_set(bool enabled)
     ESP_ERROR_CHECK(board_ch422g_commit());
 }
 
-void board_pump_set(bool on)
+i2c_master_bus_handle_t board_i2c_bus(void)
 {
-    if (!s_i2c_ready) {
-        ESP_LOGW(TAG, "POMPE: I2C non pret, commande ignoree (on=%d)", (int)on);
-        return;
-    }
-
-    if (on) {
-        s_ch422g_output |= NECTAR_CH422G_BIT_PUMP;
-    } else {
-        s_ch422g_output &= (uint8_t)~NECTAR_CH422G_BIT_PUMP;
-    }
-
-    /* Trace de ce qui part reellement sur le bus I2C vers le CH422G. */
-    ESP_LOGI(TAG,
-             "POMPE %s -> I2C ecrit: addr 0x%02X = mode 0x01 ; addr 0x%02X = sortie 0x%02X (EXIO0=%d)",
-             on ? "ON " : "OFF",
-             NECTAR_TOUCH_IO_EXPANDER_ADDR,
-             NECTAR_TOUCH_CTRL_ADDR,
-             s_ch422g_output,
-             (int)((s_ch422g_output & NECTAR_CH422G_BIT_PUMP) ? 1 : 0));
-
-    ESP_ERROR_CHECK(board_ch422g_commit());
+    return s_i2c_ready ? s_i2c_bus_handle : NULL;
 }
 
 uint16_t board_display_width(void)

@@ -30,8 +30,8 @@ void app_controller_enter_maintenance(void);
 void app_controller_leave_maintenance(void);
 void app_controller_update_custom_mix(size_t ingredient_index, uint16_t amount_ml);
 
-/* Simulateur de test (espace service) */
-void app_controller_svc_toggle_glass(void);
+/* Test du service (espace service) — matériel réel : TCA9548A (pompe), MCP23017 (verre) */
+void app_controller_svc_check_glass(void);
 void app_controller_svc_start_pump(void);
 
 const recipe_model_t *app_controller_selected_recipe(void);

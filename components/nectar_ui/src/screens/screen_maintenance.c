@@ -22,10 +22,10 @@ static void maintenance_back_cb(lv_event_t *event)
     app_controller_leave_maintenance();
 }
 
-static void svc_glass_toggle_cb(lv_event_t *event)
+static void svc_glass_check_cb(lv_event_t *event)
 {
     (void)event;
-    app_controller_svc_toggle_glass();
+    app_controller_svc_check_glass();
     screen_maintenance_refresh();
 }
 
@@ -135,15 +135,15 @@ void screen_maintenance_create(lv_obj_t *screen)
     lv_label_set_text(test_eyebrow, "TEST DU SERVICE");
     lv_obj_align(test_eyebrow, LV_ALIGN_TOP_LEFT, UI_MARGIN_X, 298);
 
-    /* Bouton à 2 états : simule la présence d'un verre. */
+    /* Bouton : lit le capteur de verre réel (MCP23017). */
     s_svc_glass_btn = ui_create_button(
         screen,
-        "Verre : absent",
+        "Vérifier le verre",
         332,
         60,
         ui_style_button_secondary(),
         ui_style_button_secondary_pressed(),
-        svc_glass_toggle_cb,
+        svc_glass_check_cb,
         NULL
     );
     lv_obj_align(s_svc_glass_btn, LV_ALIGN_TOP_LEFT, UI_MARGIN_X, 322);
@@ -198,7 +198,7 @@ void screen_maintenance_refresh(void)
         lv_obj_set_style_text_color(s_admin_reservoir_state[index], level_color, 0);
     }
 
-    /* Bouton verre (2 états). */
+    /* Bouton "Vérifier le verre" : reflète la dernière lecture du capteur réel. */
     if (s_svc_glass_btn != NULL) {
         lv_obj_t *glass_lbl = lv_obj_get_child(s_svc_glass_btn, 0);
 
@@ -208,7 +208,7 @@ void screen_maintenance_refresh(void)
             lv_obj_set_style_text_color(s_svc_glass_btn, ui_color_success(), 0);
             lv_obj_set_style_border_color(s_svc_glass_btn, ui_color_success(), 0);
         } else {
-            lv_label_set_text(glass_lbl, "Verre : absent");
+            lv_label_set_text(glass_lbl, "Vérifier le verre");
             lv_obj_set_style_bg_color(s_svc_glass_btn, ui_color_surface_alt(), 0);
             lv_obj_set_style_text_color(s_svc_glass_btn, ui_color_text_muted(), 0);
             lv_obj_set_style_border_color(s_svc_glass_btn, ui_color_line(), 0);
@@ -231,7 +231,7 @@ void screen_maintenance_refresh(void)
             lv_label_set_text_fmt(s_svc_pump_status, "Pompe ACTIVE · %u s restantes", secs);
             lv_obj_set_style_text_color(s_svc_pump_status, ui_color_success(), 0);
         } else if (!state->svc_test_glass_present) {
-            lv_label_set_text(s_svc_pump_status, "Pose un verre (bouton de gauche) pour activer le test.");
+            lv_label_set_text(s_svc_pump_status, "Pose un verre, puis touche « Vérifier le verre » ou « Tester ».");
             lv_obj_set_style_text_color(s_svc_pump_status, ui_color_text_muted(), 0);
         } else {
             lv_label_set_text(s_svc_pump_status, "Pompe arrêtée · prêt à tester.");

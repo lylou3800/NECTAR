@@ -8,7 +8,7 @@
 
 void controlPompe(bool);
 void setPompeDuration(uint32_t duration_ms);
-void servirBoisson(int secondes);
+void servirBoisson(uint32_t secondes);
 bool checkVerre(void);
 
 float lirePoid(void);
