@@ -132,12 +132,18 @@ void screen_custom_mix_create(lv_obj_t *screen)
 
         /* Flex cell 2: slider, grows to fill remaining width */
         lv_obj_set_flex_grow(slider, 1);
-        lv_obj_set_height(slider, 8);
+        lv_obj_set_height(slider, 10);
         lv_slider_set_range(slider, drink->min_ml, drink->max_ml);
         lv_slider_set_value(slider, state->custom_mix_ml[index], LV_ANIM_OFF);
         lv_obj_add_event_cb(slider, custom_mix_slider_cb, LV_EVENT_VALUE_CHANGED, (void *)(uintptr_t)index);
-        lv_obj_set_style_bg_color(slider, ui_color_surface_overlay(), 0);
-        lv_obj_set_style_bg_grad_color(slider, ui_color_surface(), 0);
+        /* Rail (piste, partie vide) bien visible avec un léger dégradé : on voit
+         * clairement toute l'étendue, de 0 (à gauche) au max (à droite). */
+        lv_obj_set_style_bg_color(slider, lv_color_hex(0xE7DBCC), 0);
+        lv_obj_set_style_bg_grad_color(slider, lv_color_hex(0xF4EBDF), 0);
+        lv_obj_set_style_bg_grad_dir(slider, LV_GRAD_DIR_HOR, 0);
+        lv_obj_set_style_bg_opa(slider, LV_OPA_COVER, 0);
+        lv_obj_set_style_border_width(slider, 1, 0);
+        lv_obj_set_style_border_color(slider, lv_color_hex(0xDDCFBC), 0);
         lv_obj_set_style_bg_color(slider, ui_color_accent(), LV_PART_INDICATOR);
         lv_obj_set_style_bg_grad_color(slider, ui_color_accent_secondary(), LV_PART_INDICATOR);
         lv_obj_set_style_bg_grad_dir(slider, LV_GRAD_DIR_HOR, LV_PART_INDICATOR);
