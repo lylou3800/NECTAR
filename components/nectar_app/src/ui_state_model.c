@@ -11,11 +11,11 @@ void ui_state_model_reset(void)
     s_state.machine_state = APP_MACHINE_IDLE;
     s_state.selection_kind = APP_SELECTION_NONE;
     s_state.selected_recipe_index = -1;
-    s_state.prepare_step = "Idle";
+    s_state.prepare_step = "";
     s_state.error_title = "";
     s_state.error_message = "";
     s_state.admin_pin_input[0] = '\0';
-    s_state.admin_pin_status = "Enter the 4-digit admin PIN.";
+    s_state.admin_pin_status = "Saisir le code PIN admin à 4 chiffres.";
     s_state.refresh_requested = true;
 }
 

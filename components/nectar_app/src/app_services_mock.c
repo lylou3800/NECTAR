@@ -23,7 +23,7 @@ void app_services_init(void)
     s_state.prepare_sequence_active = false;
     s_state.prepare_elapsed_ms = 0;
     s_state.prepare_progress = 0;
-    s_state.prepare_step = "Idle";
+    s_state.prepare_step = "";
 }
 
 void app_services_reset_glass_sequence(void)
@@ -38,7 +38,7 @@ void app_services_reset_prepare_sequence(void)
     s_state.prepare_sequence_active = true;
     s_state.prepare_elapsed_ms = 0;
     s_state.prepare_progress = 0;
-    s_state.prepare_step = "Dose check";
+    s_state.prepare_step = "C'est parti…";
 }
 
 void app_services_tick(uint32_t delta_ms)
@@ -60,19 +60,19 @@ void app_services_tick(uint32_t delta_ms)
         s_state.prepare_progress = (uint8_t)((s_state.prepare_elapsed_ms * 100U) / 4000U);
 
         if (s_state.prepare_progress < 25) {
-            s_state.prepare_step = "Recipe check";
+            s_state.prepare_step = "C'est parti…";
         } else if (s_state.prepare_progress < 65) {
-            s_state.prepare_step = "Controlled pour";
+            s_state.prepare_step = "On verse ta boisson…";
         } else if (s_state.prepare_progress < 90) {
-            s_state.prepare_step = "Final balance";
+            s_state.prepare_step = "On peaufine…";
         } else {
-            s_state.prepare_step = "Almost ready";
+            s_state.prepare_step = "Presque prêt…";
         }
 
         if (s_state.prepare_elapsed_ms >= 4000) {
             s_state.prepare_sequence_active = false;
             s_state.prepare_progress = 100;
-            s_state.prepare_step = "Drink ready";
+            s_state.prepare_step = "C'est prêt !";
         }
     }
 }

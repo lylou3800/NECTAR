@@ -40,14 +40,14 @@ static void recipe_card_monogram(const char *name, char *buffer, size_t buffer_s
 static const char *recipe_card_status_text(const recipe_model_t *recipe)
 {
     if (!recipe->available) {
-        return "UNAVAILABLE";
+        return "INDISPONIBLE";
     }
 
     if (recipe->stock_percent <= 35U) {
-        return "LOW STOCK";
+        return "BIENTÔT ÉPUISÉ";
     }
 
-    return "READY";
+    return "PRÊT";
 }
 
 lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
@@ -90,7 +90,7 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
 
     kicker = lv_label_create(button);
     lv_obj_add_style(kicker, ui_style_overline(), 0);
-    lv_label_set_text(kicker, recipe->available ? "SIGNATURE" : "PAUSED");
+    lv_label_set_text(kicker, recipe->available ? "SÉLECTION" : "EN PAUSE");
     lv_obj_align(kicker, LV_ALIGN_TOP_LEFT, 0, 0);
 
     status = lv_label_create(button);
@@ -186,7 +186,7 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
     );
     lv_label_set_text_fmt(
         footer,
-        recipe->available ? "%u mL  |  %u line%s" : "Service unavailable",
+        recipe->available ? "%u mL · %u ingrédient%s" : "Indisponible",
         recipe->total_ml,
         recipe->ingredient_count,
         recipe->ingredient_count > 1U ? "s" : ""

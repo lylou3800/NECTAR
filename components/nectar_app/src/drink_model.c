@@ -4,7 +4,7 @@
 
 static const drink_model_t s_drinks[] = {
     {
-        .name = "Citrus soda",
+        .name = "Soda agrumes",
         .min_ml = 20,
         .max_ml = 160,
         .default_ml = 60,
@@ -13,7 +13,7 @@ static const drink_model_t s_drinks[] = {
         .allergen_count = 1,
     },
     {
-        .name = "Dry tonic",
+        .name = "Tonic sec",
         .min_ml = 20,
         .max_ml = 160,
         .default_ml = 40,

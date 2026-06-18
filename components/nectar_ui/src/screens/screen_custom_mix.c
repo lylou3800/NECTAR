@@ -100,7 +100,6 @@ void screen_custom_mix_create(lv_obj_t *screen)
         const drink_model_t *drink = drink_model_at(index);
         lv_obj_t *row = lv_obj_create(container);
         lv_obj_t *name_label;
-        lv_obj_t *stock_label;
         lv_obj_t *slider;
         lv_obj_t *value_label;
 
@@ -109,7 +108,6 @@ void screen_custom_mix_create(lv_obj_t *screen)
         lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
 
         name_label = lv_label_create(row);
-        stock_label = lv_label_create(row);
         slider = lv_slider_create(row);
         value_label = lv_label_create(row);
 
@@ -119,10 +117,6 @@ void screen_custom_mix_create(lv_obj_t *screen)
         lv_label_set_long_mode(name_label, LV_LABEL_LONG_DOT);
         lv_label_set_text(name_label, drink->name);
         lv_obj_align(name_label, LV_ALIGN_TOP_LEFT, 0, 0);
-
-        lv_obj_add_style(stock_label, drink->stock_percent <= 30U ? ui_style_badge_alert() : ui_style_badge(), 0);
-        lv_label_set_text_fmt(stock_label, "%u%%", drink->stock_percent);
-        lv_obj_align(stock_label, LV_ALIGN_TOP_RIGHT, 0, -2);
 
         lv_obj_set_size(slider, UI_MIX_SLIDER_WIDTH, 8);
         lv_obj_align(slider, LV_ALIGN_BOTTOM_LEFT, 0, 0);
