@@ -280,6 +280,7 @@ void board_display_backlight_set(bool enabled)
 void board_pump_set(bool on)
 {
     if (!s_i2c_ready) {
+        ESP_LOGW(TAG, "POMPE: I2C non pret, commande ignoree (on=%d)", (int)on);
         return;
     }
 
@@ -288,6 +289,16 @@ void board_pump_set(bool on)
     } else {
         s_ch422g_output &= (uint8_t)~NECTAR_CH422G_BIT_PUMP;
     }
+
+    /* Trace de ce qui part reellement sur le bus I2C vers le CH422G. */
+    ESP_LOGI(TAG,
+             "POMPE %s -> I2C ecrit: addr 0x%02X = mode 0x01 ; addr 0x%02X = sortie 0x%02X (EXIO0=%d)",
+             on ? "ON " : "OFF",
+             NECTAR_TOUCH_IO_EXPANDER_ADDR,
+             NECTAR_TOUCH_CTRL_ADDR,
+             s_ch422g_output,
+             (int)((s_ch422g_output & NECTAR_CH422G_BIT_PUMP) ? 1 : 0));
+
     ESP_ERROR_CHECK(board_ch422g_commit());
 }
 

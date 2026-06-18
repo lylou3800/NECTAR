@@ -6,7 +6,10 @@
 #include "app_services.h"
 #include "board_display.h"
 #include "drink_model.h"
+#include "esp_log.h"
 #include "ui_state_model.h"
+
+static const char *SVC_TAG = "nectar_svc";
 
 static void app_controller_reset_admin_auth(ui_state_model_t *state, const char *status)
 {
@@ -296,6 +299,8 @@ void app_controller_svc_toggle_glass(void)
     ui_state_model_t *state = ui_state_model_mutable();
 
     state->svc_test_glass_present = !state->svc_test_glass_present;
+    ESP_LOGI(SVC_TAG, "Bouton VERRE -> %s",
+             state->svc_test_glass_present ? "PRESENT" : "ABSENT");
     ui_state_model_request_refresh();
 }
 
@@ -303,12 +308,20 @@ void app_controller_svc_start_pump(void)
 {
     ui_state_model_t *state = ui_state_model_mutable();
 
+    ESP_LOGI(SVC_TAG, "Bouton TEST SERVICE appuye (verre=%s, pompe_en_cours=%ums)",
+             state->svc_test_glass_present ? "present" : "absent",
+             (unsigned)state->svc_test_pump_ms);
+
     /* Pas de verre détecté => pas de pompe (sécurité). Ignore si déjà en cours. */
     if (!state->svc_test_glass_present || (state->svc_test_pump_ms > 0U)) {
+        ESP_LOGW(SVC_TAG, "-> Pompe NON lancee (%s)",
+                 !state->svc_test_glass_present ? "aucun verre detecte"
+                                                : "pompe deja en cours");
         return;
     }
 
     state->svc_test_pump_ms = 10000U;
+    ESP_LOGI(SVC_TAG, "-> Lancement pompe pour 10 s (envoi signal I2C)");
     board_pump_set(true);
     ui_state_model_request_refresh();
 }
@@ -321,6 +334,7 @@ void app_controller_tick(uint32_t delta_ms)
     if (state->svc_test_pump_ms > 0U) {
         if (state->svc_test_pump_ms <= (uint16_t)delta_ms) {
             state->svc_test_pump_ms = 0U;
+            ESP_LOGI(SVC_TAG, "Fin du test: 10 s ecoulees -> arret pompe");
             board_pump_set(false);
         } else {
             state->svc_test_pump_ms -= (uint16_t)delta_ms;
