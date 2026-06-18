@@ -66,9 +66,15 @@ static lv_disp_t *display_init(esp_lcd_panel_handle_t panel_handle)
     display_driver.flush_cb = flush_callback;
     display_driver.draw_buf = &draw_buffer;
     display_driver.user_data = panel_handle;
-    /* direct_mode = 1 : LVGL écrit directement dans les frame buffers PSRAM.
-     * Combiné au vsync-synchronized flush, cela élimine tout tearing. */
-    display_driver.direct_mode = 1;
+    /* Double buffering "classique" plein écran (doc LVGL) :
+     *  - full_refresh = 1 : LVGL redessine TOUT l'écran dans le back buffer à
+     *    chaque rafraîchissement (les deux buffers = les 2 framebuffers PSRAM).
+     *  - direct_mode = 0 : le flush_cb se contente de changer l'adresse du
+     *    framebuffer affiché (swap au vsync) — il n'a PAS à recopier les zones
+     *    redessinées dans l'autre buffer. Activer direct_mode SANS cette recopie
+     *    laisse des zones périmées dans le buffer affiché => tremblement/scintillement
+     *    pendant le mouvement. On le laisse donc à 0. */
+    display_driver.direct_mode = 0;
     display_driver.full_refresh = 1;
 
     return lv_disp_drv_register(&display_driver);
