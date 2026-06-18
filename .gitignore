@@ -11,8 +11,10 @@ sdkconfig.old
 
 # --- Éditeur & outillage ---
 /.vscode/
-/.claude/
 /.idea/
+# .claude : on ignore le local, mais on versionne les commandes projet partagées
+/.claude/*
+!/.claude/commands/
 
 # --- Compagnon de brainstorming (mockups temporaires) ---
 /.superpowers/
