@@ -4,6 +4,7 @@
 
 #include "admin_auth.h"
 #include "app_services.h"
+#include "board_display.h"
 #include "drink_model.h"
 #include "ui_state_model.h"
 
@@ -290,9 +291,42 @@ void app_controller_back(void)
     }
 }
 
+void app_controller_svc_toggle_glass(void)
+{
+    ui_state_model_t *state = ui_state_model_mutable();
+
+    state->svc_test_glass_present = !state->svc_test_glass_present;
+    ui_state_model_request_refresh();
+}
+
+void app_controller_svc_start_pump(void)
+{
+    ui_state_model_t *state = ui_state_model_mutable();
+
+    /* Pas de verre détecté => pas de pompe (sécurité). Ignore si déjà en cours. */
+    if (!state->svc_test_glass_present || (state->svc_test_pump_ms > 0U)) {
+        return;
+    }
+
+    state->svc_test_pump_ms = 10000U;
+    board_pump_set(true);
+    ui_state_model_request_refresh();
+}
+
 void app_controller_tick(uint32_t delta_ms)
 {
     ui_state_model_t *state = ui_state_model_mutable();
+
+    /* Décompte du test de pompe (simulateur du service), actif quel que soit l'écran. */
+    if (state->svc_test_pump_ms > 0U) {
+        if (state->svc_test_pump_ms <= (uint16_t)delta_ms) {
+            state->svc_test_pump_ms = 0U;
+            board_pump_set(false);
+        } else {
+            state->svc_test_pump_ms -= (uint16_t)delta_ms;
+        }
+        ui_state_model_request_refresh();
+    }
 
     switch (state->requested_view) {
     case APP_VIEW_BOOT:

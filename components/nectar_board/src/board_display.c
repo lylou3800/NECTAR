@@ -22,6 +22,15 @@ static const char *TAG = "nectar_board";
 #define NECTAR_TOUCH_IO_EXPANDER_ADDR 0x24
 #define NECTAR_TOUCH_CTRL_ADDR 0x38
 
+/* Registre de sortie du CH422G (adresse 0x38) — un bit par EXIO :
+ *   EXIO1=TP_RST, EXIO2=LCD_BL, EXIO3=LCD_RST, EXIO4=SD_CS, EXIO5=USB_SEL.
+ *   EXIO0 / 6 / 7 sont LIBRES -> on utilise EXIO0 (bit 0) comme sortie POMPE.
+ * Base = TP_RST|LCD_RST|SD_CS maintenus hauts (0x1A) ; le rétroéclairage (bit 2)
+ * et la pompe (bit 0) sont gérés dynamiquement via un registre "shadow". */
+#define NECTAR_CH422G_BASE 0x1A
+#define NECTAR_CH422G_BIT_BACKLIGHT (1u << 2)
+#define NECTAR_CH422G_BIT_PUMP (1u << 0)
+
 #define NECTAR_LCD_PIXEL_CLOCK_HZ (16 * 1000 * 1000)
 
 #define NECTAR_LCD_GPIO_VSYNC GPIO_NUM_3
@@ -36,6 +45,7 @@ static i2c_master_dev_handle_t s_touch_gate_dev_handle;
 static i2c_master_dev_handle_t s_touch_ctrl_dev_handle;
 static bool s_i2c_ready;
 static bool s_display_ready;
+static uint8_t s_ch422g_output = NECTAR_CH422G_BASE;
 
 IRAM_ATTR static bool board_display_on_vsync(esp_lcd_panel_handle_t panel,
                                              const esp_lcd_rgb_panel_event_data_t *event_data,
@@ -246,14 +256,39 @@ void board_display_unlock(void)
     lvgl_port_unlock();
 }
 
+static esp_err_t board_ch422g_commit(void)
+{
+    /* 0x01 -> 0x24 : place le CH422G en mode sortie, puis écrit l'octet de sortie. */
+    ESP_ERROR_CHECK(board_i2c_write(s_touch_gate_dev_handle, 0x01));
+    return board_i2c_write(s_touch_ctrl_dev_handle, s_ch422g_output);
+}
+
 void board_display_backlight_set(bool enabled)
 {
     if (!s_i2c_ready) {
         return;
     }
 
-    ESP_ERROR_CHECK(board_i2c_write(s_touch_gate_dev_handle, 0x01));
-    ESP_ERROR_CHECK(board_i2c_write(s_touch_ctrl_dev_handle, enabled ? 0x1E : 0x1A));
+    if (enabled) {
+        s_ch422g_output |= NECTAR_CH422G_BIT_BACKLIGHT;
+    } else {
+        s_ch422g_output &= (uint8_t)~NECTAR_CH422G_BIT_BACKLIGHT;
+    }
+    ESP_ERROR_CHECK(board_ch422g_commit());
+}
+
+void board_pump_set(bool on)
+{
+    if (!s_i2c_ready) {
+        return;
+    }
+
+    if (on) {
+        s_ch422g_output |= NECTAR_CH422G_BIT_PUMP;
+    } else {
+        s_ch422g_output &= (uint8_t)~NECTAR_CH422G_BIT_PUMP;
+    }
+    ESP_ERROR_CHECK(board_ch422g_commit());
 }
 
 uint16_t board_display_width(void)

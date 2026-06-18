@@ -56,6 +56,8 @@ typedef struct {
     uint8_t admin_pin_length;
     const char *admin_pin_status;
     uint32_t state_elapsed_ms;
+    bool svc_test_glass_present;   /* simulateur de test (espace service) : verre présent ? */
+    uint16_t svc_test_pump_ms;     /* simulateur de test : ms restantes de pompe active */
     bool refresh_requested;
 } ui_state_model_t;
 

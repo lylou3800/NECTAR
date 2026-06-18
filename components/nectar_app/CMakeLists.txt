@@ -7,5 +7,5 @@ idf_component_register(
         "src/recipe_model.c"
         "src/drink_model.c"
     INCLUDE_DIRS "include"
-    REQUIRES esp_common esp_timer nvs_flash
+    REQUIRES esp_common esp_timer nvs_flash nectar_board
 )
