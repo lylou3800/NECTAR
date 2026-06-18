@@ -68,7 +68,7 @@ static inline ui_header_block_t ui_create_screen_header(lv_obj_t *parent,
 {
     ui_header_block_t header = {0};
     lv_coord_t title_y = 0;
-    lv_coord_t subtitle_width = centered ? 560 : 520;
+    lv_coord_t subtitle_width = centered ? 640 : UI_CONTENT_WIDTH;
 
     header.container = lv_obj_create(parent);
     lv_obj_remove_style_all(header.container);

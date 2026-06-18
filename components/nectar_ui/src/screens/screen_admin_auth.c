@@ -76,16 +76,21 @@ static lv_obj_t *admin_auth_create_key(lv_obj_t *parent,
                                        lv_event_cb_t callback,
                                        void *user_data)
 {
-    return ui_create_button(
+    lv_obj_t *key = ui_create_button(
         parent,
         text,
         108,
-        66,
+        48,
         ui_style_button_secondary(),
         ui_style_button_secondary_pressed(),
         callback,
         user_data
     );
+    /* Padding vertical réduit : les 4 rangées de touches (48px) doivent tenir
+     * entièrement dans le pavé, sans scroll. */
+    lv_obj_set_style_pad_top(key, 4, 0);
+    lv_obj_set_style_pad_bottom(key, 4, 0);
+    return key;
 }
 
 void screen_admin_auth_create(lv_obj_t *screen)
@@ -111,6 +116,8 @@ void screen_admin_auth_create(lv_obj_t *screen)
     lv_obj_align(shell, LV_ALIGN_TOP_MID, 0, 118);
     lv_obj_set_style_bg_color(shell, ui_color_surface_alt(), 0);
     lv_obj_set_style_bg_grad_color(shell, ui_color_surface_highlight(), 0);
+    /* Pas de scroll : tout (pavé + code) doit être visible d'un coup. */
+    lv_obj_clear_flag(shell, LV_OBJ_FLAG_SCROLLABLE);
 
     title = lv_label_create(shell);
     lv_obj_add_style(title, ui_style_overline(), 0);
@@ -152,7 +159,7 @@ void screen_admin_auth_create(lv_obj_t *screen)
     lv_obj_set_size(keypad, 348, 220);
     lv_obj_align(keypad, LV_ALIGN_RIGHT_MID, 0, 0);
     lv_obj_set_flex_flow(keypad, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_style_pad_gap(keypad, 12, 0);
+    lv_obj_set_style_pad_gap(keypad, 8, 0);
     lv_obj_clear_flag(keypad, LV_OBJ_FLAG_SCROLLABLE);
 
     admin_auth_create_key(keypad, "1", admin_auth_digit_cb, (void *)(uintptr_t)1);

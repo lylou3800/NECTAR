@@ -40,14 +40,14 @@ static void recipe_card_monogram(const char *name, char *buffer, size_t buffer_s
 static const char *recipe_card_status_text(const recipe_model_t *recipe)
 {
     if (!recipe->available) {
-        return "INDISPONIBLE";
+        return "Indisponible";
     }
 
     if (recipe->stock_percent <= 35U) {
-        return "BIENTÔT ÉPUISÉ";
+        return "Bientôt épuisé";
     }
 
-    return "PRÊT";
+    return "Disponible";
 }
 
 lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
@@ -57,7 +57,6 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
                                 void *user_data)
 {
     lv_obj_t *button = lv_btn_create(parent);
-    lv_obj_t *kicker;
     lv_obj_t *status;
     lv_obj_t *media_shell;
     lv_obj_t *media_frame;
@@ -88,11 +87,8 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
         lv_obj_set_style_outline_color(button, ui_color_warning(), 0);
     }
 
-    kicker = lv_label_create(button);
-    lv_obj_add_style(kicker, ui_style_overline(), 0);
-    lv_label_set_text(kicker, recipe->available ? "SÉLECTION" : "EN PAUSE");
-    lv_obj_align(kicker, LV_ALIGN_TOP_LEFT, 0, 0);
-
+    /* Statut seul, centré en haut (le libellé "SÉLECTION" a été retiré pour ne pas
+     * chevaucher le statut sur une carte étroite). */
     status = lv_label_create(button);
     lv_obj_add_style(status, recipe->available ?
         (recipe->stock_percent <= 35U ? ui_style_badge_alert() : ui_style_badge()) :
@@ -101,7 +97,7 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
     if (!recipe->available) {
         lv_obj_set_style_border_color(status, ui_color_error(), 0);
     }
-    lv_obj_align(status, LV_ALIGN_TOP_RIGHT, 0, -2);
+    lv_obj_align(status, LV_ALIGN_TOP_MID, 0, 0);
 
     media_shell = lv_obj_create(button);
     lv_obj_remove_style_all(media_shell);
@@ -157,11 +153,8 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
     }
 
     /*
-     * Text block: title + subtitle + footer chained top-to-bottom.
-     * media_shell bottom = content_y 120 (pad_all 16 already excluded).
-     * title starts at content_y 126 (6px gap after media).
-     * heading ~24px → bottom 150; subtitle 6px gap → 156, caption ~19px → 175;
-     * footer 6px gap → 181, caption ~19px → 200 ≤ content height 204. No overlap.
+     * Bloc texte : titre + tagline + footer enchaînés du haut vers le bas.
+     * media_shell bas = content_y 120 ; titre à content_y 126 (gap 6).
      */
     title = lv_label_create(button);
     lv_obj_add_style(title, ui_style_heading(), 0);

@@ -154,12 +154,6 @@ static void recipes_home_cb(lv_event_t *event)
     app_controller_open_home();
 }
 
-static void recipes_custom_mix_cb(lv_event_t *event)
-{
-    (void)event;
-    app_controller_open_custom_mix();
-}
-
 static void recipe_select_cb(lv_event_t *event)
 {
     const uintptr_t recipe_index = (uintptr_t)lv_event_get_user_data(event);
@@ -317,16 +311,6 @@ void screen_recipes_create(lv_obj_t *screen)
         recipes_home_cb,
         NULL
     ), LV_ALIGN_LEFT_MID, 0, 0);
-    lv_obj_align(ui_create_button(
-        actions,
-        "Composer mon verre",
-        UI_PRIMARY_BUTTON_WIDTH,
-        UI_PRIMARY_BUTTON_HEIGHT,
-        ui_style_button_primary(),
-        ui_style_button_primary_pressed(),
-        recipes_custom_mix_cb,
-        NULL
-    ), LV_ALIGN_CENTER, 0, 0);
 }
 
 void screen_recipes_refresh(void)
