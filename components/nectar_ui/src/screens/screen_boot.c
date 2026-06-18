@@ -11,6 +11,29 @@ static lv_obj_t *s_loading_value;
 
 void screen_boot_create(lv_obj_t *screen)
 {
+    /* --- MIRE DIAGNOSTIC COULEUR (temporaire, retirée au Step 6) --- */
+    lv_obj_t *mire_r = lv_obj_create(screen);
+    lv_obj_remove_style_all(mire_r);
+    lv_obj_set_size(mire_r, 800, 60);
+    lv_obj_align(mire_r, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_set_style_bg_color(mire_r, lv_color_hex(0xFF0000), 0); /* doit être ROUGE */
+    lv_obj_set_style_bg_opa(mire_r, LV_OPA_COVER, 0);
+
+    lv_obj_t *mire_g = lv_obj_create(screen);
+    lv_obj_remove_style_all(mire_g);
+    lv_obj_set_size(mire_g, 800, 60);
+    lv_obj_align(mire_g, LV_ALIGN_TOP_MID, 0, 60);
+    lv_obj_set_style_bg_color(mire_g, lv_color_hex(0x00FF00), 0); /* doit être VERT */
+    lv_obj_set_style_bg_opa(mire_g, LV_OPA_COVER, 0);
+
+    lv_obj_t *mire_b = lv_obj_create(screen);
+    lv_obj_remove_style_all(mire_b);
+    lv_obj_set_size(mire_b, 800, 60);
+    lv_obj_align(mire_b, LV_ALIGN_TOP_MID, 0, 120);
+    lv_obj_set_style_bg_color(mire_b, lv_color_hex(0x0000FF), 0); /* doit être BLEU */
+    lv_obj_set_style_bg_opa(mire_b, LV_OPA_COVER, 0);
+    /* --- FIN MIRE --- */
+
     lv_obj_t *content = lv_obj_create(screen);
     lv_obj_t *eyebrow;
     lv_obj_t *brand;
