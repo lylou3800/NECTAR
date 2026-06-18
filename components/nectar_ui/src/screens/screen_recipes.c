@@ -278,13 +278,15 @@ void screen_recipes_create(lv_obj_t *screen)
     lv_obj_set_size(s_recipe_carousel, UI_RECIPE_CAROUSEL_WIDTH, UI_RECIPE_SHOWCASE_HEIGHT);
     lv_obj_center(s_recipe_carousel);
     lv_obj_set_flex_flow(s_recipe_carousel, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_pad_left(s_recipe_carousel, (UI_RECIPE_CAROUSEL_WIDTH - UI_RECIPE_CARD_WIDTH) / 2, 0);
-    lv_obj_set_style_pad_right(s_recipe_carousel, (UI_RECIPE_CAROUSEL_WIDTH - UI_RECIPE_CARD_WIDTH) / 2, 0);
+    /* Pas d'espace avant la 1re carte : pad gauche nul + snap au DÉBUT. Le pad
+     * droit permet à la dernière carte de s'aligner aussi sur le bord gauche. */
+    lv_obj_set_style_pad_left(s_recipe_carousel, 0, 0);
+    lv_obj_set_style_pad_right(s_recipe_carousel, (UI_RECIPE_CAROUSEL_WIDTH - UI_RECIPE_CARD_WIDTH), 0);
     lv_obj_set_style_pad_top(s_recipe_carousel, 0, 0);
     lv_obj_set_style_pad_bottom(s_recipe_carousel, 0, 0);
     lv_obj_set_style_pad_gap(s_recipe_carousel, UI_RECIPE_GRID_GAP, 0);
     lv_obj_set_scroll_dir(s_recipe_carousel, LV_DIR_HOR);
-    lv_obj_set_scroll_snap_x(s_recipe_carousel, LV_SCROLL_SNAP_CENTER);
+    lv_obj_set_scroll_snap_x(s_recipe_carousel, LV_SCROLL_SNAP_START);
     lv_obj_set_scrollbar_mode(s_recipe_carousel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_flag(s_recipe_carousel, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_add_event_cb(s_recipe_carousel, recipes_carousel_scroll_end_cb, LV_EVENT_SCROLL_END, NULL);
