@@ -42,10 +42,12 @@ void screen_glass_check_refresh(void)
 
     ui_glass_guide_update(s_glass_guide, state->glass_detected);
     if (state->glass_detected) {
+        lv_obj_remove_style(s_glass_status, ui_style_banner_warning(), 0);
+        lv_obj_add_style(s_glass_status, ui_style_banner(), 0);
         lv_label_set_text(s_glass_status, "Verre détecté, c'est parti !");
-        lv_obj_set_style_border_color(s_glass_status, ui_color_success(), 0);
     } else {
+        lv_obj_remove_style(s_glass_status, ui_style_banner(), 0);
+        lv_obj_add_style(s_glass_status, ui_style_banner_warning(), 0);
         lv_label_set_text(s_glass_status, "Pose ton verre sur l'emplacement pour commencer.");
-        lv_obj_set_style_border_color(s_glass_status, ui_color_warning(), 0);
     }
 }
