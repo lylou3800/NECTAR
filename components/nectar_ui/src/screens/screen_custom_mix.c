@@ -14,7 +14,9 @@ static lv_obj_t *s_mix_total_label;
 static lv_obj_t *s_mix_slider[3];
 static lv_obj_t *s_mix_value_label[3];
 
-#define UI_MIX_CARD_HEIGHT 248
+/* Carte un peu plus haute : crée un espace clair entre le badge "x mL au total"
+ * (en haut) et la première ligne de réglage (le conteneur est aligné en bas). */
+#define UI_MIX_CARD_HEIGHT 260
 #define UI_MIX_CONTAINER_HEIGHT 184
 #define UI_MIX_ROW_HEIGHT 56
 #define UI_MIX_ROW_PAD 8
