@@ -1,7 +1,6 @@
 #include "screen_home.h"
 
 #include "app_controller.h"
-#include "recipe_model.h"
 #include "ui_metrics.h"
 #include "ui_palette.h"
 #include "ui_styles.h"
@@ -99,7 +98,7 @@ void screen_home_create(lv_obj_t *screen)
     greeting = lv_label_create(screen);
     lv_obj_add_style(greeting, ui_style_title(), 0);
     lv_obj_set_style_text_font(greeting, ui_font_display(), 0);
-    lv_obj_set_width(greeting, 560);
+    lv_obj_set_width(greeting, 470);
     lv_label_set_long_mode(greeting, LV_LABEL_LONG_WRAP);
     lv_label_set_text(greeting, "Qu'est-ce qui te ferait plaisir ?");
     lv_obj_align(greeting, LV_ALIGN_TOP_LEFT, UI_MARGIN_X, UI_MARGIN_TOP + 22);
