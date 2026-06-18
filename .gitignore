@@ -1,0 +1,23 @@
+# --- Build (ESP-IDF) ---
+/build/
+
+# --- Gestionnaire de composants ESP-IDF (récupéré automatiquement) ---
+/managed_components/
+
+# --- Sauvegardes / config générée ---
+sdkconfig.old
+*.orig
+*.bak
+
+# --- Éditeur & outillage ---
+/.vscode/
+/.claude/
+/.idea/
+
+# --- Compagnon de brainstorming (mockups temporaires) ---
+/.superpowers/
+
+# --- OS ---
+Thumbs.db
+.DS_Store
+desktop.ini
