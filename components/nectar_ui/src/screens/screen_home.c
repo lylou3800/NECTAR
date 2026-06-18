@@ -1,62 +1,22 @@
 #include "screen_home.h"
 
 #include "app_controller.h"
-#include "app_services.h"
 #include "recipe_model.h"
-#include "ui_chrome.h"
 #include "ui_metrics.h"
 #include "ui_palette.h"
 #include "ui_styles.h"
+#include "ui_typography.h"
 #include "ui_state_model.h"
 
-static lv_obj_t *s_home_status_banner;
-static lv_obj_t *s_home_mode_value;
-static lv_obj_t *s_home_recipe_value;
-static lv_obj_t *s_home_reservoir_value;
+static lv_obj_t *s_home_status_chip;
 
-static const char *home_machine_state_text(app_machine_state_t machine_state)
+static const char *home_status_text(app_machine_state_t machine_state)
 {
     switch (machine_state) {
-    case APP_MACHINE_WAITING_FOR_GLASS:
-        return "Awaiting glass";
-    case APP_MACHINE_GLASS_DETECTED:
-        return "Locked for service";
-    case APP_MACHINE_PREPARING:
-        return "Crafting now";
-    case APP_MACHINE_READY:
-        return "Ready for pickup";
-    case APP_MACHINE_UNAVAILABLE:
-        return "Temporarily paused";
-    case APP_MACHINE_ERROR:
-        return "Assistance required";
-    case APP_MACHINE_MAINTENANCE:
-        return "Service access";
-    case APP_MACHINE_IDLE:
-    default:
-        return "Open now";
-    }
-}
-
-static const char *home_banner_text(app_machine_state_t machine_state)
-{
-    switch (machine_state) {
-    case APP_MACHINE_WAITING_FOR_GLASS:
-        return "Waiting for glass";
-    case APP_MACHINE_GLASS_DETECTED:
-        return "Glass detected";
-    case APP_MACHINE_PREPARING:
-        return "Pour in progress";
-    case APP_MACHINE_READY:
-        return "Ready for pickup";
-    case APP_MACHINE_UNAVAILABLE:
-        return "One recipe paused";
-    case APP_MACHINE_ERROR:
-        return "Assistance required";
-    case APP_MACHINE_MAINTENANCE:
-        return "Admin session open";
-    case APP_MACHINE_IDLE:
-    default:
-        return "Menu ready";
+    case APP_MACHINE_ERROR:        return "Indisponible";
+    case APP_MACHINE_UNAVAILABLE:  return "Un cocktail en pause";
+    case APP_MACHINE_MAINTENANCE:  return "Mode service";
+    default:                       return "Prêt à servir";
     }
 }
 
@@ -78,146 +38,99 @@ static void home_open_admin_cb(lv_event_t *event)
     app_controller_open_admin_auth();
 }
 
-static lv_obj_t *create_metric_card(lv_obj_t *parent,
-                                    const char *eyebrow_text,
-                                    const char *label,
-                                    lv_obj_t **value_label)
+static lv_obj_t *home_create_tile(lv_obj_t *parent,
+                                  const char *title_text,
+                                  const char *subtitle_text,
+                                  bool primary,
+                                  lv_event_cb_t event_cb)
 {
-    lv_obj_t *card = lv_obj_create(parent);
-    lv_obj_t *eyebrow = lv_label_create(card);
-    lv_obj_t *value = lv_label_create(card);
+    lv_obj_t *tile = lv_btn_create(parent);
+    lv_obj_t *title = lv_label_create(tile);
+    lv_obj_t *subtitle = lv_label_create(tile);
 
-    (void)label;
+    lv_obj_remove_style_all(tile);
+    lv_obj_add_style(tile, ui_style_card(), 0);
+    lv_obj_set_size(tile, 356, 196);
+    lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(tile, event_cb, LV_EVENT_CLICKED, NULL);
 
-    lv_obj_add_style(card, ui_style_card_inset(), 0);
-    lv_obj_set_size(card, UI_METRIC_CARD_WIDTH, UI_METRIC_CARD_HEIGHT);
+    if (primary) {
+        lv_obj_set_style_bg_color(tile, ui_color_accent(), 0);
+        lv_obj_set_style_bg_grad_color(tile, ui_color_accent_secondary(), 0);
+        lv_obj_set_style_bg_grad_dir(tile, LV_GRAD_DIR_VER, 0);
+        lv_obj_set_style_border_width(tile, 0, 0);
+        lv_obj_set_style_shadow_color(tile, ui_color_accent_glow(), 0);
+        lv_obj_set_style_shadow_opa(tile, LV_OPA_40, 0);
+    } else {
+        lv_obj_set_style_border_width(tile, 2, 0);
+        lv_obj_set_style_border_color(tile, lv_color_hex(0xFFD9B8), 0);
+    }
 
-    lv_obj_add_style(eyebrow, ui_style_overline(), 0);
-    lv_label_set_text(eyebrow, eyebrow_text);
-    lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_add_style(title, ui_style_title(), 0);
+    lv_obj_set_style_text_color(title, primary ? ui_color_text_ink() : ui_color_accent(), 0);
+    lv_obj_set_width(title, 312);
+    lv_label_set_long_mode(title, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(title, title_text);
+    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 22, 28);
 
-    lv_obj_add_style(value, ui_style_heading(), 0);
-    lv_obj_set_width(value, UI_METRIC_CARD_WIDTH - 28);
-    lv_label_set_long_mode(value, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(value, "--");
-    lv_obj_align(value, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+    lv_obj_add_style(subtitle, ui_style_body(), 0);
+    lv_obj_set_style_text_color(subtitle, primary ? ui_color_text_ink() : ui_color_text_secondary(), 0);
+    lv_obj_set_width(subtitle, 312);
+    lv_label_set_long_mode(subtitle, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(subtitle, subtitle_text);
+    lv_obj_align(subtitle, LV_ALIGN_TOP_LEFT, 22, 110);
 
-    *value_label = value;
-    return card;
+    return tile;
 }
 
 void screen_home_create(lv_obj_t *screen)
 {
-    lv_obj_t *hero = lv_obj_create(screen);
-    lv_obj_t *hero_strip;
     lv_obj_t *eyebrow;
-    lv_obj_t *title;
-    lv_obj_t *subtitle;
-    lv_obj_t *status_row;
-    lv_obj_t *actions;
-    lv_obj_t *halo;
+    lv_obj_t *greeting;
+    lv_obj_t *tiles;
+    lv_obj_t *service_btn;
+    lv_obj_t *service_label;
 
-    lv_obj_add_style(hero, ui_style_card(), 0);
-    lv_obj_add_style(hero, ui_style_card_highlight(), 0);
-    lv_obj_set_size(hero, UI_CONTENT_WIDTH, 176);
-    lv_obj_align(hero, LV_ALIGN_TOP_MID, 0, UI_MARGIN_TOP);
-    lv_obj_set_style_bg_color(hero, ui_color_surface(), 0);
-    lv_obj_set_style_bg_grad_color(hero, ui_color_surface_alt(), 0);
-    lv_obj_set_style_bg_grad_dir(hero, LV_GRAD_DIR_VER, 0);
-
-    hero_strip = lv_obj_create(hero);
-    lv_obj_remove_style_all(hero_strip);
-    lv_obj_set_size(hero_strip, 3, 140);
-    lv_obj_align(hero_strip, LV_ALIGN_RIGHT_MID, -12, 0);
-    lv_obj_set_style_radius(hero_strip, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_bg_color(hero_strip, ui_color_accent_secondary(), 0);
-    lv_obj_set_style_bg_opa(hero_strip, LV_OPA_COVER, 0);
-
-    halo = lv_obj_create(hero);
-    lv_obj_remove_style_all(halo);
-    lv_obj_set_size(halo, 150, 130);
-    lv_obj_align(halo, LV_ALIGN_RIGHT_MID, -34, 10);
-    lv_obj_set_style_radius(halo, 22, 0);
-    lv_obj_set_style_bg_color(halo, ui_color_surface_overlay(), 0);
-    lv_obj_set_style_bg_grad_color(halo, ui_color_surface_highlight(), 0);
-    lv_obj_set_style_bg_grad_dir(halo, LV_GRAD_DIR_VER, 0);
-    lv_obj_set_style_bg_opa(halo, LV_OPA_COVER, 0);
-    lv_obj_set_style_border_width(halo, 1, 0);
-    lv_obj_set_style_border_color(halo, ui_color_line(), 0);
-    lv_obj_set_style_shadow_width(halo, 8, 0);
-    lv_obj_set_style_shadow_color(halo, ui_color_accent_glow(), 0);
-    lv_obj_set_style_shadow_opa(halo, LV_OPA_10, 0);
-    lv_obj_set_style_shadow_ofs_y(halo, 0, 0);
-
-    eyebrow = lv_label_create(hero);
+    eyebrow = lv_label_create(screen);
     lv_obj_add_style(eyebrow, ui_style_overline(), 0);
-    lv_label_set_text(eyebrow, "EVENING CELLAR");
-    lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_label_set_text(eyebrow, "NECTAR · LE BAR");
+    lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, UI_MARGIN_X, UI_MARGIN_TOP);
 
-    title = lv_label_create(hero);
-    lv_obj_add_style(title, ui_style_title(), 0);
-    lv_obj_set_width(title, 360);
-    lv_label_set_long_mode(title, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(title, "Select a signature, then serve in one smooth flow.");
-    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 26);
+    greeting = lv_label_create(screen);
+    lv_obj_add_style(greeting, ui_style_title(), 0);
+    lv_obj_set_style_text_font(greeting, ui_font_display(), 0);
+    lv_obj_set_width(greeting, 560);
+    lv_label_set_long_mode(greeting, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(greeting, "Qu'est-ce qui te ferait plaisir ?");
+    lv_obj_align(greeting, LV_ALIGN_TOP_LEFT, UI_MARGIN_X, UI_MARGIN_TOP + 22);
 
-    subtitle = lv_label_create(hero);
-    lv_obj_add_style(subtitle, ui_style_body(), 0);
-    lv_obj_set_width(subtitle, 378);
-    lv_label_set_text(subtitle, "From curated cocktails to custom mixes, every pour stays guided by glass detection and clear service states.");
-    lv_label_set_long_mode(subtitle, LV_LABEL_LONG_WRAP);
-    lv_obj_align_to(subtitle, title, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 12);
+    s_home_status_chip = lv_label_create(screen);
+    lv_obj_add_style(s_home_status_chip, ui_style_badge(), 0);
+    lv_obj_set_style_bg_color(s_home_status_chip, lv_color_hex(0xE6F6EA), 0);
+    lv_obj_set_style_text_color(s_home_status_chip, ui_color_success(), 0);
+    lv_obj_align(s_home_status_chip, LV_ALIGN_TOP_RIGHT, -UI_MARGIN_X, UI_MARGIN_TOP);
 
-    s_home_status_banner = lv_label_create(hero);
-    lv_obj_add_style(s_home_status_banner, ui_style_banner(), 0);
-    lv_obj_set_width(s_home_status_banner, LV_SIZE_CONTENT);
-    lv_obj_set_style_border_color(s_home_status_banner, ui_color_accent_soft(), 0);
-    lv_obj_set_style_text_align(s_home_status_banner, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_align_to(s_home_status_banner, halo, LV_ALIGN_CENTER, 0, 0);
+    tiles = lv_obj_create(screen);
+    lv_obj_remove_style_all(tiles);
+    lv_obj_set_size(tiles, UI_CONTENT_WIDTH, 196);
+    lv_obj_align(tiles, LV_ALIGN_TOP_MID, 0, 150);
+    lv_obj_set_flex_flow(tiles, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_pad_gap(tiles, 32, 0);
+    lv_obj_clear_flag(tiles, LV_OBJ_FLAG_SCROLLABLE);
 
-    status_row = lv_obj_create(screen);
-    lv_obj_remove_style_all(status_row);
-    lv_obj_set_size(status_row, UI_CONTENT_WIDTH, UI_METRIC_CARD_HEIGHT);
-    lv_obj_align(status_row, LV_ALIGN_TOP_MID, 0, 216);
-    lv_obj_set_flex_flow(status_row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_pad_gap(status_row, 16, 0);
-    lv_obj_clear_flag(status_row, LV_OBJ_FLAG_SCROLLABLE);
+    home_create_tile(tiles, "Le Menu", "Nos cocktails prêts à servir.", true, home_open_recipes_cb);
+    home_create_tile(tiles, "Composer mon verre", "Crée ton propre mélange.", false, home_open_mix_cb);
 
-    create_metric_card(status_row, "SERVICE", "Service status", &s_home_mode_value);
-    create_metric_card(status_row, "MENU", "Signatures online", &s_home_recipe_value);
-    create_metric_card(status_row, "SAFETY", "Sensor gate", &s_home_reservoir_value);
-
-    actions = ui_create_action_bar(screen);
-    lv_obj_align(ui_create_button(
-        actions,
-        "Custom blend",
-        UI_SECONDARY_BUTTON_WIDTH,
-        UI_SECONDARY_BUTTON_HEIGHT,
-        ui_style_button_secondary(),
-        ui_style_button_secondary_pressed(),
-        home_open_mix_cb,
-        NULL
-    ), LV_ALIGN_LEFT_MID, 0, 0);
-    lv_obj_align(ui_create_button(
-        actions,
-        "Open menu",
-        UI_PRIMARY_BUTTON_WIDTH,
-        UI_PRIMARY_BUTTON_HEIGHT,
-        ui_style_button_primary(),
-        ui_style_button_primary_pressed(),
-        home_open_recipes_cb,
-        NULL
-    ), LV_ALIGN_CENTER, 0, 0);
-    lv_obj_align(ui_create_button(
-        actions,
-        "Service",
-        UI_TERTIARY_BUTTON_WIDTH,
-        UI_SECONDARY_BUTTON_HEIGHT,
-        ui_style_button_secondary(),
-        ui_style_button_secondary_pressed(),
-        home_open_admin_cb,
-        NULL
-    ), LV_ALIGN_RIGHT_MID, 0, 0);
+    service_btn = lv_btn_create(screen);
+    lv_obj_remove_style_all(service_btn);
+    lv_obj_add_style(service_btn, ui_style_button_secondary(), 0);
+    lv_obj_add_style(service_btn, ui_style_button_secondary_pressed(), LV_STATE_PRESSED);
+    lv_obj_set_size(service_btn, 160, 52);
+    lv_obj_align(service_btn, LV_ALIGN_BOTTOM_RIGHT, -UI_MARGIN_X, -UI_MARGIN_BOTTOM);
+    lv_obj_add_event_cb(service_btn, home_open_admin_cb, LV_EVENT_CLICKED, NULL);
+    service_label = lv_label_create(service_btn);
+    lv_label_set_text(service_label, "Service");
+    lv_obj_center(service_label);
 
     screen_home_refresh();
 }
@@ -225,33 +138,20 @@ void screen_home_create(lv_obj_t *screen)
 void screen_home_refresh(void)
 {
     const ui_state_model_t *state = ui_state_model_get();
-    size_t available_recipes = 0;
-    size_t index;
 
-    if ((s_home_status_banner == NULL) || (s_home_mode_value == NULL) ||
-        (s_home_recipe_value == NULL) || (s_home_reservoir_value == NULL)) {
+    if (s_home_status_chip == NULL) {
         return;
     }
 
-    for (index = 0; index < recipe_model_count(); index++) {
-        const recipe_model_t *recipe = recipe_model_at(index);
-
-        if (recipe != NULL && recipe->available) {
-            available_recipes++;
-        }
+    lv_label_set_text(s_home_status_chip, home_status_text(state->machine_state));
+    if (state->machine_state == APP_MACHINE_ERROR) {
+        lv_obj_set_style_bg_color(s_home_status_chip, lv_color_hex(0xFCE4E4), 0);
+        lv_obj_set_style_text_color(s_home_status_chip, ui_color_error(), 0);
+    } else if (state->machine_state == APP_MACHINE_UNAVAILABLE) {
+        lv_obj_set_style_bg_color(s_home_status_chip, lv_color_hex(0xFFF3D6), 0);
+        lv_obj_set_style_text_color(s_home_status_chip, lv_color_hex(0x9A6500), 0);
+    } else {
+        lv_obj_set_style_bg_color(s_home_status_chip, lv_color_hex(0xE6F6EA), 0);
+        lv_obj_set_style_text_color(s_home_status_chip, ui_color_success(), 0);
     }
-
-    lv_label_set_text_fmt(s_home_mode_value, "%s", home_machine_state_text(state->machine_state));
-    lv_label_set_text_fmt(s_home_recipe_value, "%u signatures live", (unsigned int)available_recipes);
-    lv_label_set_text_fmt(
-        s_home_reservoir_value,
-        state->glass_detected ? "Lock confirmed" : "Waiting for glass"
-    );
-    lv_label_set_text(s_home_status_banner, home_banner_text(state->machine_state));
-    lv_obj_set_style_border_color(
-        s_home_status_banner,
-        state->machine_state == APP_MACHINE_ERROR ? ui_color_error() :
-            (state->machine_state == APP_MACHINE_UNAVAILABLE ? ui_color_warning() : ui_color_success()),
-        0
-    );
 }
