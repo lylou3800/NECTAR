@@ -15,15 +15,24 @@ static const char *TAG = "nectar_lvgl";
 
 #define LVGL_PORT_TICK_PERIOD_MS 2
 #define LVGL_PORT_TASK_MAX_DELAY_MS 500
-#define LVGL_PORT_TASK_MIN_DELAY_MS 5
+#define LVGL_PORT_TASK_MIN_DELAY_MS 1
 #define LVGL_PORT_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_PORT_TASK_PRIORITY 4
 #define LVGL_PORT_TASK_CORE 1
 
 static SemaphoreHandle_t s_lvgl_mutex;
 static TaskHandle_t s_lvgl_task_handle;
-static volatile bool s_flush_pending = false;
-static lv_disp_drv_t *s_flush_drv = NULL;
+
+/* Synchronisation anti-tearing — schéma officiel Espressif pour panneau RGB en
+ * DOUBLE framebuffer (sans bounce buffer). Poignée de main à deux sémaphores
+ * entre le flush LVGL (contexte tâche) et l'interruption vsync du panneau :
+ *  - le flush signale "GUI prête" (s_sem_gui_ready) puis ATTEND la fin du vsync
+ *    (s_sem_vsync_end) avant de basculer le framebuffer affiché ;
+ *  - l'ISR vsync, si une GUI est prête, libère s_sem_vsync_end.
+ * Garantit que chaque image affichée est complète et que le swap est aligné au
+ * vsync => aucun tearing/tremblement pendant le mouvement. */
+static SemaphoreHandle_t s_sem_vsync_end;
+static SemaphoreHandle_t s_sem_gui_ready;
 
 static void flush_callback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
 {
@@ -31,12 +40,11 @@ static void flush_callback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t
 
     (void)area;
 
-    /* Enregistre le driver pour que le vsync puisse appeler lv_disp_flush_ready.
-     * Ne PAS appeler lv_disp_flush_ready ici : le buffer swap n'est effectif
-     * qu'au prochain vsync ; l'appeler avant causerait du tearing/flickering. */
-    s_flush_drv = drv;
-    s_flush_pending = true;
+    xSemaphoreGive(s_sem_gui_ready);
+    xSemaphoreTake(s_sem_vsync_end, portMAX_DELAY);
 
+    /* full_refresh => color_map est l'un des deux framebuffers plein écran ;
+     * le panneau bascule dessus au prochain vsync (swap zéro-copie). */
     esp_lcd_panel_draw_bitmap(
         panel_handle,
         0,
@@ -45,6 +53,8 @@ static void flush_callback(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t
         BOARD_DISPLAY_V_RES,
         color_map
     );
+
+    lv_disp_flush_ready(drv);
 }
 
 static lv_disp_t *display_init(esp_lcd_panel_handle_t panel_handle)
@@ -66,14 +76,9 @@ static lv_disp_t *display_init(esp_lcd_panel_handle_t panel_handle)
     display_driver.flush_cb = flush_callback;
     display_driver.draw_buf = &draw_buffer;
     display_driver.user_data = panel_handle;
-    /* Double buffering "classique" plein écran (doc LVGL) :
-     *  - full_refresh = 1 : LVGL redessine TOUT l'écran dans le back buffer à
-     *    chaque rafraîchissement (les deux buffers = les 2 framebuffers PSRAM).
-     *  - direct_mode = 0 : le flush_cb se contente de changer l'adresse du
-     *    framebuffer affiché (swap au vsync) — il n'a PAS à recopier les zones
-     *    redessinées dans l'autre buffer. Activer direct_mode SANS cette recopie
-     *    laisse des zones périmées dans le buffer affiché => tremblement/scintillement
-     *    pendant le mouvement. On le laisse donc à 0. */
+    /* Double buffering plein écran (les 2 buffers = les 2 framebuffers PSRAM) :
+     * full_refresh=1 + direct_mode=0 => le flush_cb fait un simple swap d'adresse
+     * de framebuffer (mode "traditional double buffering" de la doc LVGL). */
     display_driver.direct_mode = 0;
     display_driver.full_refresh = 1;
 
@@ -135,26 +140,9 @@ static void lvgl_port_task(void *arg)
 
     uint32_t task_delay_ms = LVGL_PORT_TASK_MAX_DELAY_MS;
     while (true) {
-        TickType_t wait_ticks;
-
-        /* Attendre le vsync (ou le timeout) AVANT de rendre.
-         * Cela garantit que lv_disp_flush_ready() n'est appelé qu'après
-         * que le LCD a effectivement basculé sur le nouveau frame buffer. */
-        wait_ticks = pdMS_TO_TICKS(task_delay_ms);
-        if (wait_ticks == 0U) {
-            wait_ticks = 1U;
-        }
-        (void)ulTaskNotifyTake(pdTRUE, wait_ticks);
-
+        /* lv_timer_handler() appelle flush_callback() qui se bloque sur la
+         * poignée de main vsync : le rythme de rendu se cale donc sur le vsync. */
         if (lvgl_port_lock(-1)) {
-            /* Si un flush est en attente de confirmation vsync, le signaler
-             * maintenant que le swap de buffer est effectif. */
-            if (s_flush_pending && s_flush_drv != NULL) {
-                lv_disp_flush_ready(s_flush_drv);
-                s_flush_drv = NULL;
-                s_flush_pending = false;
-            }
-
             task_delay_ms = lv_timer_handler();
             lvgl_port_unlock();
         }
@@ -164,6 +152,8 @@ static void lvgl_port_task(void *arg)
         } else if (task_delay_ms < LVGL_PORT_TASK_MIN_DELAY_MS) {
             task_delay_ms = LVGL_PORT_TASK_MIN_DELAY_MS;
         }
+
+        vTaskDelay(pdMS_TO_TICKS(task_delay_ms));
     }
 }
 
@@ -174,6 +164,12 @@ esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle
 
     s_lvgl_mutex = xSemaphoreCreateRecursiveMutex();
     if (s_lvgl_mutex == NULL) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    s_sem_vsync_end = xSemaphoreCreateBinary();
+    s_sem_gui_ready = xSemaphoreCreateBinary();
+    if ((s_sem_vsync_end == NULL) || (s_sem_gui_ready == NULL)) {
         return ESP_ERR_NO_MEM;
     }
 
@@ -219,11 +215,13 @@ void lvgl_port_unlock(void)
 
 IRAM_ATTR bool lvgl_port_notify_rgb_vsync(void)
 {
-    BaseType_t need_yield = pdFALSE;
+    BaseType_t high_task_awoken = pdFALSE;
 
-    if (s_lvgl_task_handle != NULL) {
-        xTaskNotifyFromISR(s_lvgl_task_handle, 1U, eIncrement, &need_yield);
+    if ((s_sem_gui_ready != NULL) && (s_sem_vsync_end != NULL)) {
+        if (xSemaphoreTakeFromISR(s_sem_gui_ready, &high_task_awoken) == pdTRUE) {
+            xSemaphoreGiveFromISR(s_sem_vsync_end, &high_task_awoken);
+        }
     }
 
-    return need_yield == pdTRUE;
+    return high_task_awoken == pdTRUE;
 }

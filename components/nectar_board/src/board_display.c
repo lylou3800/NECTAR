@@ -23,7 +23,6 @@ static const char *TAG = "nectar_board";
 #define NECTAR_TOUCH_CTRL_ADDR 0x38
 
 #define NECTAR_LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
-#define NECTAR_LCD_BOUNCE_BUFFER_SIZE (BOARD_DISPLAY_H_RES * 10)
 
 #define NECTAR_LCD_GPIO_VSYNC GPIO_NUM_3
 #define NECTAR_LCD_GPIO_HSYNC GPIO_NUM_46
@@ -158,7 +157,10 @@ static esp_err_t board_panel_init(void)
         .data_width = 16,
         .dma_burst_size = 64,
         .num_fbs = LVGL_PORT_LCD_RGB_BUFFER_NUMS,
-        .bounce_buffer_size_px = NECTAR_LCD_BOUNCE_BUFFER_SIZE,
+        /* Double framebuffer => PAS de bounce buffer (doc Espressif : le bounce
+         * buffer est réservé au mono-framebuffer ; combiné à 2 FB il provoque le
+         * décalage/tremblement de l'image pendant le mouvement). */
+        .bounce_buffer_size_px = 0,
         .clk_src = LCD_CLK_SRC_DEFAULT,
         .timings = {
             .pclk_hz = NECTAR_LCD_PIXEL_CLOCK_HZ,
