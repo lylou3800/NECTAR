@@ -14,7 +14,9 @@ extern "C" {
 #define UI_MARGIN_BOTTOM 22
 
 #define UI_CONTENT_WIDTH (UI_SCREEN_WIDTH - (2 * UI_MARGIN_X))
-#define UI_HEADER_HEIGHT 74
+/* Hauteur du conteneur d'en-tête : doit englober eyebrow + titre (police display)
+ * + sous-titre, sinon LVGL clippe le bas du sous-titre (jambages coupés). */
+#define UI_HEADER_HEIGHT 98
 #define UI_ACTION_BAR_HEIGHT 72
 #define UI_SECTION_GAP 18
 #define UI_CARD_RADIUS 26
