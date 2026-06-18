@@ -25,9 +25,9 @@ void screen_ready_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "SERVICE COMPLETE",
-        "Your drink is ready",
-        "A short final confirmation keeps pickup clear and immediate.",
+        "C'EST PRÊT",
+        "Ta boisson est prête !",
+        "Récupère ton verre, bonne dégustation.",
         true
     );
 
@@ -52,14 +52,14 @@ void screen_ready_create(lv_obj_t *screen)
 
     label = lv_label_create(card);
     lv_obj_add_style(label, ui_style_overline(), 0);
-    lv_label_set_text(label, "PICKUP NOW");
+    lv_label_set_text(label, "À TOI DE JOUER");
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 198, 18);
 
     label = lv_label_create(card);
     lv_obj_add_style(label, ui_style_title(), 0);
     lv_obj_set_width(label, 330);
     lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(label, "Your drink is ready for pickup.");
+    lv_label_set_text(label, "Ta boisson t'attend.");
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 198, 42);
 
     label = lv_label_create(card);
@@ -68,9 +68,9 @@ void screen_ready_create(lv_obj_t *screen)
     lv_obj_set_width(label, 330);
     lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
     if (state->selection_kind == APP_SELECTION_RECIPE && recipe != NULL) {
-        lv_label_set_text_fmt(label, "%s is complete.", recipe->name);
+        lv_label_set_text_fmt(label, "%s, c'est prêt !", recipe->name);
     } else {
-        lv_label_set_text(label, "Your custom blend is complete.");
+        lv_label_set_text(label, "Ton mélange est prêt !");
     }
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 198, 108);
 
@@ -78,13 +78,13 @@ void screen_ready_create(lv_obj_t *screen)
     lv_obj_add_style(label, ui_style_body(), 0);
     lv_obj_set_width(label, 330);
     lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(label, "Lift the glass when ready. The menu will reopen automatically after the final cycle clears.");
+    lv_label_set_text(label, "Prends ton verre. Le menu revient tout seul dans un instant.");
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 198, 142);
 
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Back home",
+        "Accueil",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),

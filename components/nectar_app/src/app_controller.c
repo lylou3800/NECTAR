@@ -61,7 +61,7 @@ esp_err_t app_controller_init(void)
         state->custom_mix_ml[index] = (drink != NULL) ? drink->default_ml : 0;
     }
     app_controller_update_custom_total(state);
-    app_controller_reset_admin_auth(state, "Enter the 4-digit admin PIN.");
+    app_controller_reset_admin_auth(state, "Entre le code à 4 chiffres.");
     ui_state_model_request_refresh();
     return ESP_OK;
 }
@@ -106,14 +106,14 @@ void app_controller_select_recipe(size_t recipe_index)
     ui_state_model_t *state = ui_state_model_mutable();
 
     if (recipe == NULL) {
-        app_controller_go_to_error("Recipe not found", "The selected recipe does not exist.");
+        app_controller_go_to_error("Cocktail introuvable", "Ce cocktail n'existe pas.");
         return;
     }
 
     if (!recipe->available) {
         state->machine_state = APP_MACHINE_UNAVAILABLE;
-        state->error_title = "Recipe unavailable";
-        state->error_message = "A critical ingredient is empty right now. Please choose another recipe.";
+        state->error_title = "Cocktail indisponible";
+        state->error_message = "Un ingrédient est épuisé. Choisis un autre cocktail.";
         app_controller_set_view(state, APP_VIEW_ERROR);
         return;
     }
@@ -152,7 +152,7 @@ void app_controller_confirm_selection(void)
     const ui_state_model_t *state = ui_state_model_get();
 
     if (state->selection_kind == APP_SELECTION_NONE) {
-        app_controller_go_to_error("Selection required", "Choose a recipe or create a custom mix before continuing.");
+        app_controller_go_to_error("Fais ton choix", "Choisis un cocktail ou compose ton mélange.");
         return;
     }
 
@@ -166,7 +166,7 @@ void app_controller_start_service(void)
     state->machine_state = APP_MACHINE_WAITING_FOR_GLASS;
     state->glass_detected = false;
     state->prepare_progress = 0;
-    state->prepare_step = "Waiting for glass";
+    state->prepare_step = "En attente du verre";
     app_services_reset_glass_sequence();
     app_controller_set_view(state, APP_VIEW_GLASS_CHECK);
 }
@@ -180,7 +180,7 @@ void app_controller_open_admin_auth(void)
 {
     ui_state_model_t *state = ui_state_model_mutable();
 
-    app_controller_reset_admin_auth(state, "Enter the 4-digit admin PIN.");
+    app_controller_reset_admin_auth(state, "Entre le code à 4 chiffres.");
     app_controller_set_view(state, APP_VIEW_ADMIN_AUTH);
 }
 
@@ -194,7 +194,7 @@ void app_controller_admin_pin_append(uint8_t digit)
 
     state->admin_pin_input[state->admin_pin_length++] = (char)('0' + digit);
     state->admin_pin_input[state->admin_pin_length] = '\0';
-    state->admin_pin_status = "Tap Unlock to open the admin dashboard.";
+    state->admin_pin_status = "Appuie sur Déverrouiller.";
     if (state->requested_view != APP_VIEW_ADMIN_AUTH) {
         ui_state_model_request_refresh();
     }
@@ -210,7 +210,7 @@ void app_controller_admin_pin_backspace(void)
 
     state->admin_pin_length--;
     state->admin_pin_input[state->admin_pin_length] = '\0';
-    state->admin_pin_status = "Enter the 4-digit admin PIN.";
+    state->admin_pin_status = "Entre le code à 4 chiffres.";
     if (state->requested_view != APP_VIEW_ADMIN_AUTH) {
         ui_state_model_request_refresh();
     }
@@ -221,7 +221,7 @@ void app_controller_admin_pin_submit(void)
     ui_state_model_t *state = ui_state_model_mutable();
 
     if (state->admin_pin_length != 4) {
-        state->admin_pin_status = "PIN must contain exactly 4 digits.";
+        state->admin_pin_status = "Le code fait 4 chiffres.";
         if (state->requested_view != APP_VIEW_ADMIN_AUTH) {
             ui_state_model_request_refresh();
         }
@@ -229,7 +229,7 @@ void app_controller_admin_pin_submit(void)
     }
 
     if (!admin_auth_verify_pin(state->admin_pin_input)) {
-        app_controller_reset_admin_auth(state, "Incorrect PIN. Try again.");
+        app_controller_reset_admin_auth(state, "Code incorrect. Réessaie.");
         if (state->requested_view != APP_VIEW_ADMIN_AUTH) {
             ui_state_model_request_refresh();
         }
@@ -238,7 +238,7 @@ void app_controller_admin_pin_submit(void)
 
     state->admin_authenticated = true;
     state->machine_state = APP_MACHINE_MAINTENANCE;
-    app_controller_reset_admin_auth(state, "Access granted.");
+    app_controller_reset_admin_auth(state, "Accès autorisé.");
     app_controller_set_view(state, APP_VIEW_MAINTENANCE);
 }
 
@@ -247,7 +247,7 @@ void app_controller_admin_logout(void)
     ui_state_model_t *state = ui_state_model_mutable();
 
     state->admin_authenticated = false;
-    app_controller_reset_admin_auth(state, "Enter the 4-digit admin PIN.");
+    app_controller_reset_admin_auth(state, "Entre le code à 4 chiffres.");
     app_controller_open_home();
 }
 
@@ -322,7 +322,7 @@ void app_controller_tick(uint32_t delta_ms)
             if (state->state_elapsed_ms >= 700) {
                 state->machine_state = APP_MACHINE_PREPARING;
                 state->prepare_progress = 0;
-                state->prepare_step = "Dose check";
+                state->prepare_step = "Préparation";
                 app_services_reset_prepare_sequence();
                 app_controller_set_view(state, APP_VIEW_PREPARING);
             }

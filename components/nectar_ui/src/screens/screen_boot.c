@@ -52,12 +52,12 @@ void screen_boot_create(lv_obj_t *screen)
     lv_obj_add_style(eyebrow, ui_style_overline(), 0);
     lv_obj_set_width(eyebrow, 600);
     lv_obj_set_style_text_align(eyebrow, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(eyebrow, "DARK COCKTAIL EXPERIENCE");
+    lv_label_set_text(eyebrow, "LE BAR FESTIF");
     lv_obj_align(eyebrow, LV_ALIGN_TOP_MID, 0, 4);
 
     brand = lv_label_create(content);
     lv_obj_add_style(brand, ui_style_title(), 0);
-    lv_obj_set_style_text_font(brand, ui_font_display(), 0);
+    lv_obj_set_style_text_font(brand, ui_font_wordmark(), 0);
     lv_obj_set_width(brand, 600);
     lv_obj_set_style_text_align(brand, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(brand, "NECTAR");
@@ -68,12 +68,12 @@ void screen_boot_create(lv_obj_t *screen)
     lv_obj_set_width(subtitle, 520);
     lv_obj_set_style_text_align(subtitle, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_long_mode(subtitle, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(subtitle, "Initializing the touch service, crafting engine and safety flow.");
+    lv_label_set_text(subtitle, "Préparation du service et de l'expérience tactile…");
     lv_obj_align(subtitle, LV_ALIGN_TOP_MID, 0, 98);
 
     loading = lv_label_create(content);
     lv_obj_add_style(loading, ui_style_title(), 0);
-    lv_obj_set_style_text_font(loading, ui_font_display(), 0);
+    lv_obj_set_style_text_font(loading, ui_font_hero(), 0);
     lv_obj_set_style_text_color(loading, ui_color_accent_secondary(), 0);
     lv_label_set_text(loading, "74%");
     lv_obj_align(loading, LV_ALIGN_BOTTOM_MID, 0, -34);
@@ -83,7 +83,7 @@ void screen_boot_create(lv_obj_t *screen)
     lv_obj_add_style(hint, ui_style_caption(), 0);
     lv_obj_set_width(hint, 520);
     lv_obj_set_style_text_align(hint, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(hint, "Preparing the 7-inch display and guided serving journey.");
+    lv_label_set_text(hint, "On allume le bar, c'est presque prêt.");
     lv_obj_align_to(hint, loading, LV_ALIGN_OUT_TOP_MID, 0, -12);
 }
 

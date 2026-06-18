@@ -31,7 +31,7 @@ static void admin_auth_apply_state(void)
     lv_label_set_text(s_status_label, state->admin_pin_status);
     lv_obj_set_style_text_color(
         s_status_label,
-        strstr(state->admin_pin_status, "Incorrect") != NULL ? lv_color_hex(0xFF8E7A) : ui_color_text_secondary(),
+        strstr(state->admin_pin_status, "incorrect") != NULL ? lv_color_hex(0xFF8E7A) : ui_color_text_secondary(),
         0
     );
 }
@@ -98,9 +98,9 @@ void screen_admin_auth_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "SERVICE ACCESS",
-        "Unlock diagnostics",
-        "Enter the service PIN to access diagnostics and maintenance tools.",
+        "ACCÈS SERVICE",
+        "Accès maintenance",
+        "Entre le code pour accéder à la maintenance.",
         false
     );
 
@@ -113,14 +113,14 @@ void screen_admin_auth_create(lv_obj_t *screen)
 
     title = lv_label_create(shell);
     lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "AUTHORIZED STAFF");
+    lv_label_set_text(title, "PERSONNEL AUTORISÉ");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     subtitle = lv_label_create(shell);
     lv_obj_add_style(subtitle, ui_style_body(), 0);
     lv_obj_set_width(subtitle, 276);
     lv_label_set_long_mode(subtitle, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(subtitle, "Use the keypad to unlock service mode. Public ordering remains separate from this space.");
+    lv_label_set_text(subtitle, "Utilise le clavier pour ouvrir le mode service.");
     lv_obj_align_to(subtitle, title, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 10);
 
     pin_card = lv_obj_create(shell);
@@ -131,7 +131,7 @@ void screen_admin_auth_create(lv_obj_t *screen)
 
     title = lv_label_create(pin_card);
     lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "PIN");
+    lv_label_set_text(title, "CODE");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     s_pin_dots = lv_label_create(pin_card);
@@ -162,14 +162,14 @@ void screen_admin_auth_create(lv_obj_t *screen)
     admin_auth_create_key(keypad, "7", admin_auth_digit_cb, (void *)(uintptr_t)7);
     admin_auth_create_key(keypad, "8", admin_auth_digit_cb, (void *)(uintptr_t)8);
     admin_auth_create_key(keypad, "9", admin_auth_digit_cb, (void *)(uintptr_t)9);
-    admin_auth_create_key(keypad, "Cancel", admin_auth_cancel_cb, NULL);
+    admin_auth_create_key(keypad, "Annuler", admin_auth_cancel_cb, NULL);
     admin_auth_create_key(keypad, "0", admin_auth_digit_cb, (void *)(uintptr_t)0);
-    admin_auth_create_key(keypad, "Delete", admin_auth_backspace_cb, NULL);
+    admin_auth_create_key(keypad, "Effacer", admin_auth_backspace_cb, NULL);
 
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Cancel",
+        "Annuler",
         UI_SECONDARY_BUTTON_WIDTH,
         UI_SECONDARY_BUTTON_HEIGHT,
         ui_style_button_secondary(),
@@ -179,7 +179,7 @@ void screen_admin_auth_create(lv_obj_t *screen)
     ), LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(ui_create_button(
         actions,
-        "Unlock",
+        "Déverrouiller",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),

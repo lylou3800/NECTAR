@@ -27,14 +27,14 @@ static size_t s_recipe_active_index;
 static const char *recipes_status_text(const recipe_model_t *recipe)
 {
     if ((recipe == NULL) || !recipe->available) {
-        return "Unavailable";
+        return "Indisponible";
     }
 
     if (recipe->stock_percent <= 35U) {
-        return "Low stock";
+        return "Bientôt épuisé";
     }
 
-    return "Ready to pour";
+    return "Prêt à servir";
 }
 
 static void recipes_apply_focus_state(const recipe_model_t *recipe)
@@ -91,11 +91,10 @@ static void recipes_update_focus(size_t index)
     if (s_recipe_meta_label != NULL) {
         lv_label_set_text_fmt(
             s_recipe_meta_label,
-            "%u mL serve\n%u ingredient%s  |  stock %u%%",
+            "%u mL  ·  %u ingrédient%s",
             recipe->total_ml,
             recipe->ingredient_count,
-            recipe->ingredient_count > 1U ? "s" : "",
-            recipe->stock_percent
+            recipe->ingredient_count > 1U ? "s" : ""
         );
     }
 
@@ -112,8 +111,8 @@ static void recipes_update_focus(size_t index)
         lv_label_set_text_fmt(
             s_recipe_swipe_label,
             total > 1U ?
-                "Swipe to browse %u signatures" :
-                "Tap to open this signature",
+                "Glisse pour voir les %u cocktails" :
+                "Touche pour ouvrir ce cocktail",
             (unsigned int)total
         );
     }
@@ -188,9 +187,9 @@ void screen_recipes_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "CELLAR MENU",
-        "Signature cocktails",
-        "Slide through the selection and open a card for full recipe details.",
+        "LE MENU",
+        "Choisis ton cocktail",
+        "Fais défiler et touche une carte pour la découvrir.",
         false
     );
 
@@ -221,7 +220,7 @@ void screen_recipes_create(lv_obj_t *screen)
 
     focus_eyebrow = lv_label_create(s_recipe_focus_panel);
     lv_obj_add_style(focus_eyebrow, ui_style_overline(), 0);
-    lv_label_set_text(focus_eyebrow, "CELLAR CURATION");
+    lv_label_set_text(focus_eyebrow, "SÉLECTION");
     lv_obj_align(focus_eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
 
     s_recipe_position_label = lv_label_create(s_recipe_focus_panel);
@@ -257,7 +256,7 @@ void screen_recipes_create(lv_obj_t *screen)
 
     s_recipe_status_label = lv_label_create(s_recipe_focus_panel);
     lv_obj_add_style(s_recipe_status_label, ui_style_badge(), 0);
-    lv_label_set_text(s_recipe_status_label, "Ready to pour");
+    lv_label_set_text(s_recipe_status_label, "Prêt à servir");
     lv_obj_align(s_recipe_status_label, LV_ALIGN_BOTTOM_LEFT, 0, -84);
 
     s_recipe_meta_label = lv_label_create(s_recipe_focus_panel);
@@ -271,7 +270,7 @@ void screen_recipes_create(lv_obj_t *screen)
     lv_obj_add_style(s_recipe_swipe_label, ui_style_caption(), 0);
     lv_obj_set_width(s_recipe_swipe_label, 220);
     lv_label_set_long_mode(s_recipe_swipe_label, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(s_recipe_swipe_label, "Swipe sideways to browse the menu.");
+    lv_label_set_text(s_recipe_swipe_label, "Glisse sur le côté pour parcourir le menu.");
     lv_obj_align(s_recipe_swipe_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     rail_shell = lv_obj_create(showcase);
@@ -312,7 +311,7 @@ void screen_recipes_create(lv_obj_t *screen)
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Home",
+        "Accueil",
         UI_TERTIARY_BUTTON_WIDTH,
         UI_SECONDARY_BUTTON_HEIGHT,
         ui_style_button_secondary(),
@@ -322,7 +321,7 @@ void screen_recipes_create(lv_obj_t *screen)
     ), LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(ui_create_button(
         actions,
-        "Craft blend",
+        "Composer mon verre",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),

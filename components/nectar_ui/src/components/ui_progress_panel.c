@@ -22,17 +22,17 @@ lv_obj_t *ui_progress_panel_create(lv_obj_t *parent)
 
     eyebrow = lv_label_create(panel);
     lv_obj_add_style(eyebrow, ui_style_overline(), 0);
-    lv_label_set_text(eyebrow, "PREPARATION");
+    lv_label_set_text(eyebrow, "PRÉPARATION");
     lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
 
     title = lv_label_create(panel);
     lv_obj_add_style(title, ui_style_title(), 0);
-    lv_label_set_text(title, "Crafting your drink");
+    lv_label_set_text(title, "On prépare ton verre…");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 28);
 
     status = lv_label_create(panel);
     lv_obj_add_style(status, ui_style_badge(), 0);
-    lv_label_set_text(status, "GLASS LOCKED");
+    lv_label_set_text(status, "VERRE EN PLACE");
     lv_obj_align(status, LV_ALIGN_TOP_RIGHT, 0, -2);
 
     percent = lv_label_create(panel);
@@ -46,14 +46,14 @@ lv_obj_t *ui_progress_panel_create(lv_obj_t *parent)
     lv_obj_add_style(summary, ui_style_body(), 0);
     lv_obj_set_width(summary, 520);
     lv_label_set_long_mode(summary, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(summary, "The full sequence is redrawn cleanly while the machine advances through each controlled phase.");
+    lv_label_set_text(summary, "Ta boisson se prépare, plus que quelques secondes.");
     lv_obj_align(summary, LV_ALIGN_TOP_LEFT, 0, 90);
 
     step = lv_label_create(panel);
     lv_obj_add_style(step, ui_style_heading(), 0);
     lv_obj_set_width(step, 680);
     lv_label_set_long_mode(step, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(step, "Initializing sequence");
+    lv_label_set_text(step, "Démarrage…");
     lv_obj_align(step, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     return panel;

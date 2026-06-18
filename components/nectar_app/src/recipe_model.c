@@ -5,13 +5,13 @@
 static const recipe_model_t s_recipes[] = {
     {
         .name = "Citrus Spritz",
-        .tagline = "Fresh, bright, quick serve",
+        .tagline = "Frais et pétillant",
         .visual_src = NULL,
         .available = true,
         .stock_percent = 78,
         .ingredients = {
-            {.name = "Citrus soda", .amount_ml = 90},
-            {.name = "Dry tonic", .amount_ml = 40},
+            {.name = "Soda agrumes", .amount_ml = 90},
+            {.name = "Tonic sec", .amount_ml = 40},
         },
         .ingredient_count = 2,
         .allergens = {ALLERGEN_CITRUS, ALLERGEN_QUININE},
@@ -20,13 +20,13 @@ static const recipe_model_t s_recipes[] = {
     },
     {
         .name = "Ginger Fizz",
-            .tagline = "Soft spice, lively finish",
+            .tagline = "Épicé et vif",
         .visual_src = NULL,
         .available = true,
         .stock_percent = 61,
         .ingredients = {
             {.name = "Ginger ale", .amount_ml = 80},
-            {.name = "Dry tonic", .amount_ml = 40},
+            {.name = "Tonic sec", .amount_ml = 40},
         },
         .ingredient_count = 2,
         .allergens = {ALLERGEN_GINGER, ALLERGEN_QUININE},
@@ -35,12 +35,12 @@ static const recipe_model_t s_recipes[] = {
     },
     {
         .name = "Ruby Sunset",
-            .tagline = "Premium fruit profile",
+            .tagline = "Fruité et intense",
         .visual_src = NULL,
         .available = false,
         .stock_percent = 0,
         .ingredients = {
-            {.name = "Citrus soda", .amount_ml = 70},
+            {.name = "Soda agrumes", .amount_ml = 70},
             {.name = "Ginger ale", .amount_ml = 60},
         },
         .ingredient_count = 2,
@@ -50,13 +50,13 @@ static const recipe_model_t s_recipes[] = {
     },
     {
         .name = "Night Tonic",
-            .tagline = "Dry, crisp, very clean",
+            .tagline = "Sec et net",
         .visual_src = NULL,
         .available = true,
         .stock_percent = 32,
         .ingredients = {
-            {.name = "Dry tonic", .amount_ml = 110},
-            {.name = "Citrus soda", .amount_ml = 20},
+            {.name = "Tonic sec", .amount_ml = 110},
+            {.name = "Soda agrumes", .amount_ml = 20},
         },
         .ingredient_count = 2,
         .allergens = {ALLERGEN_QUININE, ALLERGEN_CITRUS},

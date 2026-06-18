@@ -20,22 +20,22 @@ static const char *admin_machine_state_text(app_machine_state_t machine_state)
 {
     switch (machine_state) {
     case APP_MACHINE_WAITING_FOR_GLASS:
-        return "Waiting for glass";
+        return "En attente du verre";
     case APP_MACHINE_GLASS_DETECTED:
-        return "Glass detected";
+        return "Verre détecté";
     case APP_MACHINE_PREPARING:
-        return "Preparing";
+        return "Préparation";
     case APP_MACHINE_READY:
-        return "Ready";
+        return "Prêt";
     case APP_MACHINE_UNAVAILABLE:
-        return "Unavailable";
+        return "Indisponible";
     case APP_MACHINE_ERROR:
-        return "Error";
+        return "Erreur";
     case APP_MACHINE_MAINTENANCE:
-        return "Admin active";
+        return "Mode service";
     case APP_MACHINE_IDLE:
     default:
-        return "Idle";
+        return "Au repos";
     }
 }
 
@@ -79,15 +79,15 @@ void screen_maintenance_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "SERVICE DECK",
-        "Maintenance overview",
-        "Live reservoir telemetry, preparation state and glass lock visibility for staff.",
+        "ESPACE SERVICE",
+        "Niveaux & état",
+        "Niveaux des réservoirs et état de la machine.",
         false
     );
 
     button = ui_create_button(
         screen,
-        "Close service",
+        "Fermer le service",
         UI_SECONDARY_BUTTON_WIDTH,
         UI_SECONDARY_BUTTON_HEIGHT,
         ui_style_button_primary(),
@@ -106,8 +106,8 @@ void screen_maintenance_create(lv_obj_t *screen)
     lv_obj_clear_flag(status_row, LV_OBJ_FLAG_SCROLLABLE);
 
     maintenance_create_status_tile(status_row, "Machine", &s_admin_machine_value);
-    maintenance_create_status_tile(status_row, "Prepare", &s_admin_prepare_value);
-    maintenance_create_status_tile(status_row, "Sensor", &s_admin_security_value);
+    maintenance_create_status_tile(status_row, "Préparation", &s_admin_prepare_value);
+    maintenance_create_status_tile(status_row, "Capteur verre", &s_admin_security_value);
 
     grid = lv_obj_create(screen);
     lv_obj_remove_style_all(grid);
@@ -165,7 +165,7 @@ void screen_maintenance_create(lv_obj_t *screen)
         lv_obj_add_style(state, ui_style_heading(), 0);
         lv_obj_set_width(state, 188);
         lv_label_set_long_mode(state, LV_LABEL_LONG_WRAP);
-        lv_label_set_text(state, level <= 30U ? "Critical refill window" : "Stable serving range");
+        lv_label_set_text(state, level <= 30U ? "Recharge critique" : "Niveau correct");
         lv_obj_align(state, LV_ALIGN_TOP_LEFT, 0, 102);
         s_admin_reservoir_state[index] = state;
 
@@ -173,7 +173,7 @@ void screen_maintenance_create(lv_obj_t *screen)
         lv_obj_add_style(hint, level <= 30U ? ui_style_banner_warning() : ui_style_banner(), 0);
         lv_obj_set_width(hint, 188);
         lv_label_set_long_mode(hint, LV_LABEL_LONG_WRAP);
-        lv_label_set_text_fmt(hint, level <= 30U ? "Refill soon." : "Ready for service.");
+        lv_label_set_text_fmt(hint, level <= 30U ? "À recharger." : "OK pour le service.");
         lv_obj_align(hint, LV_ALIGN_BOTTOM_LEFT, 0, 0);
         s_admin_reservoir_label[index] = hint;
     }
@@ -192,7 +192,7 @@ void screen_maintenance_refresh(void)
 
     lv_label_set_text(s_admin_machine_value, admin_machine_state_text(state->machine_state));
     lv_label_set_text_fmt(s_admin_prepare_value, "%u%%\n%s", state->prepare_progress, state->prepare_step);
-    lv_label_set_text(s_admin_security_value, state->glass_detected ? "Glass lock active" : "Waiting for lock");
+    lv_label_set_text(s_admin_security_value, state->glass_detected ? "Verre en place" : "En attente du verre");
 
     for (index = 0; index < drink_model_count() && index < 3; index++) {
         const uint8_t level = app_services_reservoir_level(index);
@@ -205,8 +205,8 @@ void screen_maintenance_refresh(void)
 
         lv_label_set_text(
             s_admin_reservoir_state[index],
-            level <= 15U ? "Immediate refill needed" :
-                (level <= 30U ? "Refill window open" : "Stable serving range")
+            level <= 15U ? "Recharge immédiate" :
+                (level <= 30U ? "À recharger bientôt" : "Niveau correct")
         );
         lv_obj_set_style_text_color(
             s_admin_reservoir_state[index],
@@ -217,8 +217,8 @@ void screen_maintenance_refresh(void)
         lv_label_set_text_fmt(s_admin_reservoir_percent[index], "%u%%", level);
         lv_label_set_text_fmt(
             s_admin_reservoir_label[index],
-            level <= 15U ? "Critical level (%u%%)." :
-                (level <= 30U ? "Refill soon (%u%%)." : "Ready (%u%%)."),
+            level <= 15U ? "Niveau critique (%u%%)." :
+                (level <= 30U ? "À recharger (%u%%)." : "OK (%u%%)."),
             level
         );
     }

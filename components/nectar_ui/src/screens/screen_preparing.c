@@ -15,9 +15,9 @@ void screen_preparing_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "STEP 2",
-        "Preparing your order",
-        "Progress stays visible at every stage while the glass-safe cycle remains secured.",
+        "ÉTAPE 2",
+        "On prépare ton verre",
+        "Encore quelques instants…",
         false
     );
 
@@ -28,7 +28,7 @@ void screen_preparing_create(lv_obj_t *screen)
     lv_obj_add_style(hint, ui_style_banner(), 0);
     lv_obj_set_width(hint, UI_CONTENT_WIDTH);
     lv_label_set_long_mode(hint, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(hint, "The blend continues only while the glass remains secured. Progress updates stay stable and readable throughout the pour.");
+    lv_label_set_text(hint, "Garde ton verre en place, ta boisson arrive.");
     lv_obj_align(hint, LV_ALIGN_BOTTOM_MID, 0, -22);
 
     screen_preparing_refresh();

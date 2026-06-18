@@ -67,13 +67,13 @@ void screen_drink_detail_create(lv_obj_t *screen)
     char monogram_text[3] = {0};
 
     if (recipe == NULL) {
-        ui_create_screen_header(screen, "RECIPE DETAIL", "Recipe not found", "Return to the menu and choose another option.", true);
+        ui_create_screen_header(screen, "LA RECETTE", "Cocktail introuvable", "Reviens au menu et choisis-en un autre.", true);
         return;
     }
 
     detail_monogram(recipe->name, monogram_text, sizeof(monogram_text));
 
-    ui_create_screen_header(screen, "RECIPE DETAIL", recipe->name, recipe->tagline, false);
+    ui_create_screen_header(screen, "LA RECETTE", recipe->name, recipe->tagline, false);
 
     hero = lv_obj_create(screen);
     lv_obj_add_style(hero, ui_style_card(), 0);
@@ -85,12 +85,12 @@ void screen_drink_detail_create(lv_obj_t *screen)
 
     title = lv_label_create(hero);
     lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "CURATED SERVE");
+    lv_label_set_text(title, "À DÉCOUVRIR");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     badge = lv_label_create(hero);
     lv_obj_add_style(badge, recipe->stock_percent <= 35U ? ui_style_badge_alert() : ui_style_badge(), 0);
-    lv_label_set_text(badge, recipe->stock_percent <= 35U ? "LOW STOCK" : "READY");
+    lv_label_set_text(badge, recipe->stock_percent <= 35U ? "BIENTÔT ÉPUISÉ" : "PRÊT");
     lv_obj_align(badge, LV_ALIGN_TOP_RIGHT, 0, 0);
 
     halo = lv_obj_create(hero);
@@ -115,7 +115,7 @@ void screen_drink_detail_create(lv_obj_t *screen)
     lv_obj_add_style(subtitle, ui_style_heading(), 0);
     lv_obj_set_width(subtitle, 220);
     lv_obj_set_style_text_align(subtitle, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text_fmt(subtitle, "%u mL crafted serve", recipe->total_ml);
+    lv_label_set_text_fmt(subtitle, "%u mL par verre", recipe->total_ml);
     lv_obj_align(subtitle, LV_ALIGN_BOTTOM_MID, 0, -66);
 
     container = lv_obj_create(hero);
@@ -137,14 +137,14 @@ void screen_drink_detail_create(lv_obj_t *screen)
 
     title = lv_label_create(summary);
     lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "BLEND BREAKDOWN");
+    lv_label_set_text(title, "COMPOSITION");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     subtitle = lv_label_create(summary);
     lv_obj_add_style(subtitle, ui_style_body(), 0);
     lv_obj_set_width(subtitle, 390);
     lv_label_set_long_mode(subtitle, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(subtitle, "Measured for one glass with clear ratios, allergen visibility and a consistent finish.");
+    lv_label_set_text(subtitle, "Composition d'un verre : ingrédients et allergènes en clair.");
     lv_obj_align(subtitle, LV_ALIGN_TOP_LEFT, 0, 26);
 
     container = lv_obj_create(summary);
@@ -175,13 +175,13 @@ void screen_drink_detail_create(lv_obj_t *screen)
 
     title = lv_label_create(summary);
     lv_obj_add_style(title, ui_style_heading(), 0);
-    lv_label_set_text_fmt(title, "%u mL total volume", recipe->total_ml);
+    lv_label_set_text_fmt(title, "%u mL au total", recipe->total_ml);
     lv_obj_align(title, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Back",
+        "Retour",
         UI_SECONDARY_BUTTON_WIDTH,
         UI_SECONDARY_BUTTON_HEIGHT,
         ui_style_button_secondary(),
@@ -191,7 +191,7 @@ void screen_drink_detail_create(lv_obj_t *screen)
     ), LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(ui_create_button(
         actions,
-        "Start serving",
+        "Servir",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),

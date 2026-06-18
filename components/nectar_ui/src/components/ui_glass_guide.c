@@ -46,26 +46,26 @@ lv_obj_t *ui_glass_guide_create(lv_obj_t *parent)
 
     eyebrow = lv_label_create(guide);
     lv_obj_add_style(eyebrow, ui_style_overline(), 0);
-    lv_label_set_text(eyebrow, "SAFETY CHECK");
+    lv_label_set_text(eyebrow, "EMPLACEMENT");
     lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 266, 10);
 
     state_label = lv_label_create(guide);
     lv_obj_add_style(state_label, ui_style_title(), 0);
     lv_obj_set_width(state_label, 360);
     lv_label_set_long_mode(state_label, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(state_label, "Place the glass inside the illuminated ring.");
+    lv_label_set_text(state_label, "Pose ton verre dans l'anneau.");
     lv_obj_align(state_label, LV_ALIGN_TOP_LEFT, 266, 42);
 
     hint_label = lv_label_create(guide);
     lv_obj_add_style(hint_label, ui_style_body(), 0);
-    lv_label_set_text(hint_label, "The recipe starts only after the sensor confirms correct placement. This keeps service clean, stable and secure.");
+    lv_label_set_text(hint_label, "Le service démarre automatiquement dès que ton verre est en place.");
     lv_label_set_long_mode(hint_label, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(hint_label, 402);
     lv_obj_align(hint_label, LV_ALIGN_TOP_LEFT, 266, 110);
 
     status_badge = lv_label_create(guide);
     lv_obj_add_style(status_badge, ui_style_badge(), 0);
-    lv_label_set_text(status_badge, "WAITING FOR SENSOR");
+    lv_label_set_text(status_badge, "EN ATTENTE");
     lv_obj_align(status_badge, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 
     return guide;
@@ -94,19 +94,19 @@ void ui_glass_guide_update(lv_obj_t *guide, bool detected)
         lv_obj_set_style_outline_color(ring, ui_color_success(), 0);
         lv_obj_set_style_bg_color(glow, ui_color_success(), 0);
         lv_obj_set_style_bg_opa(glow, LV_OPA_20, 0);
-        lv_label_set_text(state_label, "Glass detected and locked for service.");
-        lv_label_set_text(hint_label, "The preparation flow is now secured. Keep the glass in place while the drink is being crafted.");
+        lv_label_set_text(state_label, "Verre détecté, c'est parti !");
+        lv_label_set_text(hint_label, "Garde ton verre en place pendant la préparation.");
         lv_obj_add_style(status_badge, ui_style_badge(), 0);
         lv_obj_set_style_border_color(status_badge, ui_color_success(), 0);
-        lv_label_set_text(status_badge, "SENSOR READY");
+        lv_label_set_text(status_badge, "PRÊT");
     } else {
         lv_obj_set_style_border_color(ring, ui_color_line(), 0);
         lv_obj_set_style_outline_color(ring, ui_color_line_soft(), 0);
         lv_obj_set_style_bg_color(glow, ui_color_accent(), 0);
-        lv_obj_set_style_bg_opa(glow, LV_OPA_10, 0);
-        lv_label_set_text(state_label, "Place the glass inside the illuminated ring.");
-        lv_label_set_text(hint_label, "The recipe starts only after the sensor confirms correct placement. This keeps service clean, stable and secure.");
+        lv_obj_set_style_bg_opa(glow, LV_OPA_20, 0);
+        lv_label_set_text(state_label, "Pose ton verre dans l'anneau.");
+        lv_label_set_text(hint_label, "Le service démarre automatiquement dès que ton verre est en place.");
         lv_obj_set_style_border_color(status_badge, ui_color_line_soft(), 0);
-        lv_label_set_text(status_badge, "WAITING FOR SENSOR");
+        lv_label_set_text(status_badge, "EN ATTENTE");
     }
 }

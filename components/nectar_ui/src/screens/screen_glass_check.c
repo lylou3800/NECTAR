@@ -14,9 +14,9 @@ void screen_glass_check_create(lv_obj_t *screen)
 {
     ui_create_screen_header(
         screen,
-        "STEP 1",
-        "Place your glass",
-        "The pour begins only after the placement ring confirms a clean, stable position.",
+        "ÉTAPE 1",
+        "Pose ton verre",
+        "Le service démarre dès que ton verre est bien posé.",
         false
     );
 
@@ -42,10 +42,10 @@ void screen_glass_check_refresh(void)
 
     ui_glass_guide_update(s_glass_guide, state->glass_detected);
     if (state->glass_detected) {
-        lv_label_set_text(s_glass_status, "Sensor confirmed. Preparation can now begin with the glass safely locked in place.");
+        lv_label_set_text(s_glass_status, "Verre détecté, c'est parti !");
         lv_obj_set_style_border_color(s_glass_status, ui_color_success(), 0);
     } else {
-        lv_label_set_text(s_glass_status, "Serving stays paused until the ring confirms placement. Keep the glass inside the guide and the next step will start automatically.");
+        lv_label_set_text(s_glass_status, "Pose ton verre sur l'emplacement pour commencer.");
         lv_obj_set_style_border_color(s_glass_status, ui_color_warning(), 0);
     }
 }

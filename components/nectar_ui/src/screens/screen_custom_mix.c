@@ -28,7 +28,7 @@ static void custom_mix_sync_live_labels(size_t ingredient_index)
     const ui_state_model_t *state = ui_state_model_get();
 
     if (s_mix_total_label != NULL) {
-        lv_label_set_text_fmt(s_mix_total_label, "%u mL selected", state->custom_total_ml);
+        lv_label_set_text_fmt(s_mix_total_label, "%u mL au total", state->custom_total_ml);
     }
 
     if ((ingredient_index < 3U) && (s_mix_value_label[ingredient_index] != NULL)) {
@@ -68,9 +68,9 @@ void screen_custom_mix_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "CUSTOM BLEND",
-        "Build your own pour",
-        "Adjust each line, then confirm the final volume before service.",
+        "MON MÉLANGE",
+        "Compose ton verre",
+        "Règle chaque ingrédient, puis lance le service.",
         false
     );
 
@@ -80,12 +80,12 @@ void screen_custom_mix_create(lv_obj_t *screen)
 
     title = lv_label_create(card);
     lv_obj_add_style(title, ui_style_overline(), 0);
-    lv_label_set_text(title, "LIVE MIXER");
+    lv_label_set_text(title, "INGRÉDIENTS");
     lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     s_mix_total_label = lv_label_create(card);
     lv_obj_add_style(s_mix_total_label, ui_style_badge_alert(), 0);
-    lv_label_set_text(s_mix_total_label, "0 mL selected");
+    lv_label_set_text(s_mix_total_label, "0 mL au total");
     lv_obj_align(s_mix_total_label, LV_ALIGN_TOP_RIGHT, 0, 0);
 
     container = lv_obj_create(card);
@@ -155,7 +155,7 @@ void screen_custom_mix_create(lv_obj_t *screen)
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Back",
+        "Retour",
         UI_SECONDARY_BUTTON_WIDTH,
         UI_SECONDARY_BUTTON_HEIGHT,
         ui_style_button_secondary(),
@@ -165,7 +165,7 @@ void screen_custom_mix_create(lv_obj_t *screen)
     ), LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(ui_create_button(
         actions,
-        "Start serving",
+        "Servir",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),
@@ -186,7 +186,7 @@ void screen_custom_mix_refresh(void)
         return;
     }
 
-    lv_label_set_text_fmt(s_mix_total_label, "%u mL selected", state->custom_total_ml);
+    lv_label_set_text_fmt(s_mix_total_label, "%u mL au total", state->custom_total_ml);
     for (index = 0; index < 3; index++) {
         if ((s_mix_slider[index] != NULL) && (s_mix_value_label[index] != NULL)) {
             if (lv_slider_get_value(s_mix_slider[index]) != state->custom_mix_ml[index]) {

@@ -23,9 +23,9 @@ void screen_error_create(lv_obj_t *screen)
 
     ui_create_screen_header(
         screen,
-        "SERVICE NOTICE",
-        "An action is required",
-        "The interface stays clear and readable while the system explains what needs attention.",
+        "INFO",
+        "Petit souci",
+        "Pas de panique, voici quoi faire.",
         true
     );
 
@@ -58,7 +58,7 @@ void screen_error_create(lv_obj_t *screen)
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(
         actions,
-        "Back home",
+        "Accueil",
         UI_PRIMARY_BUTTON_WIDTH,
         UI_PRIMARY_BUTTON_HEIGHT,
         ui_style_button_primary(),
