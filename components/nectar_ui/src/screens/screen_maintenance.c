@@ -228,13 +228,13 @@ void screen_maintenance_refresh(void)
     if (s_svc_pump_status != NULL) {
         if (state->svc_test_pump_ms > 0U) {
             const unsigned int secs = ((unsigned int)state->svc_test_pump_ms + 999U) / 1000U;
-            lv_label_set_text_fmt(s_svc_pump_status, "Pompe ACTIVE — %u s restantes", secs);
+            lv_label_set_text_fmt(s_svc_pump_status, "Pompe ACTIVE · %u s restantes", secs);
             lv_obj_set_style_text_color(s_svc_pump_status, ui_color_success(), 0);
         } else if (!state->svc_test_glass_present) {
             lv_label_set_text(s_svc_pump_status, "Pose un verre (bouton de gauche) pour activer le test.");
             lv_obj_set_style_text_color(s_svc_pump_status, ui_color_text_muted(), 0);
         } else {
-            lv_label_set_text(s_svc_pump_status, "Pompe arrêtée — prêt à tester.");
+            lv_label_set_text(s_svc_pump_status, "Pompe arrêtée · prêt à tester.");
             lv_obj_set_style_text_color(s_svc_pump_status, ui_color_text_secondary(), 0);
         }
     }
