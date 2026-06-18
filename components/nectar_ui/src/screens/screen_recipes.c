@@ -300,7 +300,7 @@ void screen_recipes_create(lv_obj_t *screen)
 
     for (index = 0; index < recipe_model_count(); index++) {
         const recipe_model_t *recipe = recipe_model_at(index);
-        ui_card_recipe_create(s_recipe_carousel, recipe, recipe_select_cb, (void *)(uintptr_t)index);
+        ui_card_recipe_create(s_recipe_carousel, recipe, index, recipe_select_cb, (void *)(uintptr_t)index);
     }
 
     lv_obj_update_layout(s_recipe_carousel);

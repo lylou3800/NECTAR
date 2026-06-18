@@ -37,8 +37,8 @@ lv_obj_t *ui_progress_panel_create(lv_obj_t *parent)
 
     percent = lv_label_create(panel);
     lv_obj_add_style(percent, ui_style_title(), 0);
-    lv_obj_set_style_text_font(percent, ui_font_display(), 0);
-    lv_obj_set_style_text_color(percent, ui_color_accent_secondary(), 0);
+    lv_obj_set_style_text_font(percent, ui_font_hero(), 0);
+    lv_obj_set_style_text_color(percent, ui_color_accent(), 0);
     lv_label_set_text(percent, "0%");
     lv_obj_align(percent, LV_ALIGN_TOP_RIGHT, 0, 26);
 

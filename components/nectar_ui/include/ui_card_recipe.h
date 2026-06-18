@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 #include "lvgl.h"
 #include "recipe_model.h"
 
@@ -9,6 +11,7 @@ extern "C" {
 
 lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
                                 const recipe_model_t *recipe,
+                                size_t family_index,
                                 lv_event_cb_t event_cb,
                                 void *user_data);
 

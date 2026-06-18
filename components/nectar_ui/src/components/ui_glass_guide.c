@@ -25,7 +25,7 @@ lv_obj_t *ui_glass_guide_create(lv_obj_t *parent)
     lv_obj_align(glow, LV_ALIGN_LEFT_MID, 42, 0);
     lv_obj_set_style_radius(glow, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(glow, ui_color_accent(), 0);
-    lv_obj_set_style_bg_opa(glow, LV_OPA_10, 0);
+    lv_obj_set_style_bg_opa(glow, LV_OPA_20, 0);
     lv_obj_set_style_shadow_width(glow, 12, 0);
     lv_obj_set_style_shadow_color(glow, ui_color_accent_glow(), 0);
     lv_obj_set_style_shadow_opa(glow, LV_OPA_20, 0);

@@ -52,6 +52,7 @@ static const char *recipe_card_status_text(const recipe_model_t *recipe)
 
 lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
                                 const recipe_model_t *recipe,
+                                size_t family_index,
                                 lv_event_cb_t event_cb,
                                 void *user_data)
 {
@@ -140,17 +141,17 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
         lv_obj_set_size(halo, 62, 62);
         lv_obj_align(halo, LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_style_radius(halo, LV_RADIUS_CIRCLE, 0);
-        lv_obj_set_style_bg_color(halo, recipe->available ? ui_color_accent() : ui_color_disabled(), 0);
-        lv_obj_set_style_bg_opa(halo, recipe->available ? LV_OPA_30 : LV_OPA_20, 0);
-        lv_obj_set_style_shadow_width(halo, 8, 0);
-        lv_obj_set_style_shadow_color(halo, recipe->available ? ui_color_accent_glow() : ui_color_surface_overlay(), 0);
-        lv_obj_set_style_shadow_opa(halo, recipe->available ? LV_OPA_20 : LV_OPA_10, 0);
+        lv_obj_set_style_bg_color(halo, recipe->available ? ui_color_family(family_index) : ui_color_disabled(), 0);
+        lv_obj_set_style_bg_opa(halo, recipe->available ? LV_OPA_COVER : LV_OPA_40, 0);
+        lv_obj_set_style_shadow_width(halo, 10, 0);
+        lv_obj_set_style_shadow_color(halo, recipe->available ? ui_color_family(family_index) : ui_color_disabled(), 0);
+        lv_obj_set_style_shadow_opa(halo, recipe->available ? LV_OPA_30 : LV_OPA_10, 0);
         lv_obj_set_style_shadow_ofs_y(halo, 0, 0);
 
         monogram = lv_label_create(media_frame);
         lv_obj_add_style(monogram, ui_style_title(), 0);
         lv_obj_set_style_text_font(monogram, ui_font_display(), 0);
-        lv_obj_set_style_text_color(monogram, recipe->available ? ui_color_text_primary() : ui_color_text_muted(), 0);
+        lv_obj_set_style_text_color(monogram, recipe->available ? ui_color_text_ink() : ui_color_text_muted(), 0);
         lv_label_set_text(monogram, monogram_text);
         lv_obj_center(monogram);
     }
