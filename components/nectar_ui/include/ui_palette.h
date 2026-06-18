@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lvgl.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +24,11 @@ lv_color_t ui_color_text_ink(void);
 lv_color_t ui_color_success(void);
 lv_color_t ui_color_warning(void);
 lv_color_t ui_color_error(void);
+lv_color_t ui_color_info(void);
 lv_color_t ui_color_disabled(void);
 lv_color_t ui_color_line(void);
 lv_color_t ui_color_line_soft(void);
+lv_color_t ui_color_family(size_t index);
 
 #ifdef __cplusplus
 }
