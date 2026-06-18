@@ -22,7 +22,7 @@ static const char *TAG = "nectar_board";
 #define NECTAR_TOUCH_IO_EXPANDER_ADDR 0x24
 #define NECTAR_TOUCH_CTRL_ADDR 0x38
 
-#define NECTAR_LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
+#define NECTAR_LCD_PIXEL_CLOCK_HZ (16 * 1000 * 1000)
 
 #define NECTAR_LCD_GPIO_VSYNC GPIO_NUM_3
 #define NECTAR_LCD_GPIO_HSYNC GPIO_NUM_46
@@ -157,10 +157,12 @@ static esp_err_t board_panel_init(void)
         .data_width = 16,
         .dma_burst_size = 64,
         .num_fbs = LVGL_PORT_LCD_RGB_BUFFER_NUMS,
-        /* Double framebuffer => PAS de bounce buffer (doc Espressif : le bounce
-         * buffer est réservé au mono-framebuffer ; combiné à 2 FB il provoque le
-         * décalage/tremblement de l'image pendant le mouvement). */
-        .bounce_buffer_size_px = 0,
+        /* Bounce buffer (10 lignes) — config officielle Waveshare pour ce panneau :
+         * le LCD lit depuis un petit buffer SRAM réalimenté par DMA depuis la PSRAM,
+         * ce qui stabilise le flux pixel et, combiné à la synchro on_frame_buf_complete,
+         * supprime le tearing. Le signal de fin de frame est alors on_frame_buf_complete
+         * (cf. board_display_init), pas on_vsync. */
+        .bounce_buffer_size_px = BOARD_DISPLAY_H_RES * 10,
         .clk_src = LCD_CLK_SRC_DEFAULT,
         .timings = {
             .pclk_hz = NECTAR_LCD_PIXEL_CLOCK_HZ,
@@ -221,8 +223,11 @@ esp_err_t board_display_init(void)
     ESP_ERROR_CHECK(board_touch_init());
     ESP_ERROR_CHECK(lvgl_port_init(s_panel_handle, s_touch_handle));
 
+    /* Bounce buffer actif => le signal "frame entièrement transmise au LCD" est
+     * on_frame_buf_complete (API ESP-IDF v6 ; et NON on_vsync). C'est lui qui
+     * débloque le flush LVGL pour la synchro anti-tearing (cf. lvgl_port.c). */
     const esp_lcd_rgb_panel_event_callbacks_t callbacks = {
-        .on_vsync = board_display_on_vsync,
+        .on_frame_buf_complete = board_display_on_vsync,
     };
     ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(s_panel_handle, &callbacks, NULL));
 
