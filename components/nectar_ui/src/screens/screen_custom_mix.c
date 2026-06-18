@@ -15,13 +15,12 @@ static lv_obj_t *s_mix_slider[3];
 static lv_obj_t *s_mix_value_label[3];
 
 #define UI_MIX_CARD_HEIGHT 248
-#define UI_MIX_CONTAINER_HEIGHT 180
-#define UI_MIX_ROW_HEIGHT 52
+#define UI_MIX_CONTAINER_HEIGHT 184
+#define UI_MIX_ROW_HEIGHT 56
+#define UI_MIX_ROW_PAD 8
 #define UI_MIX_ROW_WIDTH (UI_CONTENT_WIDTH - 36)
-#define UI_MIX_ROW_INNER_WIDTH (UI_MIX_ROW_WIDTH - 28)
-#define UI_MIX_NAME_WIDTH 220
-#define UI_MIX_VALUE_WIDTH 76
-#define UI_MIX_SLIDER_WIDTH (UI_MIX_ROW_INNER_WIDTH - UI_MIX_VALUE_WIDTH - 12)
+#define UI_MIX_NAME_WIDTH 200
+#define UI_MIX_VALUE_WIDTH 84
 
 static void custom_mix_sync_live_labels(size_t ingredient_index)
 {
@@ -93,7 +92,7 @@ void screen_custom_mix_create(lv_obj_t *screen)
     lv_obj_set_size(container, UI_CONTENT_WIDTH - 36, UI_MIX_CONTAINER_HEIGHT);
     lv_obj_align(container, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_gap(container, 12, 0);
+    lv_obj_set_style_pad_gap(container, 6, 0);
     lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
 
     for (index = 0; index < drink_model_count() && index < 3; index++) {
@@ -105,21 +104,33 @@ void screen_custom_mix_create(lv_obj_t *screen)
 
         lv_obj_add_style(row, ui_style_card_inset(), 0);
         lv_obj_set_size(row, UI_MIX_ROW_WIDTH, UI_MIX_ROW_HEIGHT);
+        lv_obj_set_style_pad_all(row, 10, 0);
+        lv_obj_set_style_pad_column(row, 12, 0);
+        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
 
         name_label = lv_label_create(row);
         slider = lv_slider_create(row);
         value_label = lv_label_create(row);
 
+        /* Flex cell 1: ingredient name, fixed width */
         lv_obj_add_style(name_label, ui_style_heading(), 0);
         lv_obj_set_style_text_color(name_label, ui_color_text_primary(), 0);
         lv_obj_set_width(name_label, UI_MIX_NAME_WIDTH);
         lv_label_set_long_mode(name_label, LV_LABEL_LONG_DOT);
         lv_label_set_text(name_label, drink->name);
-        lv_obj_align(name_label, LV_ALIGN_TOP_LEFT, 0, 0);
 
-        lv_obj_set_size(slider, UI_MIX_SLIDER_WIDTH, 8);
-        lv_obj_align(slider, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+        /* Flex cell 3: mL value, fixed width, right-aligned text */
+        lv_obj_add_style(value_label, ui_style_heading(), 0);
+        lv_obj_set_width(value_label, UI_MIX_VALUE_WIDTH);
+        lv_obj_set_style_text_align(value_label, LV_TEXT_ALIGN_RIGHT, 0);
+        lv_label_set_text_fmt(value_label, "%u mL", state->custom_mix_ml[index]);
+        s_mix_value_label[index] = value_label;
+
+        /* Flex cell 2: slider, grows to fill remaining width */
+        lv_obj_set_flex_grow(slider, 1);
+        lv_obj_set_height(slider, 8);
         lv_slider_set_range(slider, drink->min_ml, drink->max_ml);
         lv_slider_set_value(slider, state->custom_mix_ml[index], LV_ANIM_OFF);
         lv_obj_add_event_cb(slider, custom_mix_slider_cb, LV_EVENT_VALUE_CHANGED, (void *)(uintptr_t)index);
@@ -137,13 +148,6 @@ void screen_custom_mix_create(lv_obj_t *screen)
         lv_obj_set_style_shadow_color(slider, ui_color_accent_glow(), LV_PART_KNOB);
         lv_obj_set_style_shadow_opa(slider, LV_OPA_0, LV_PART_KNOB);
         s_mix_slider[index] = slider;
-
-        lv_obj_add_style(value_label, ui_style_heading(), 0);
-        lv_obj_set_width(value_label, UI_MIX_VALUE_WIDTH);
-        lv_obj_set_style_text_align(value_label, LV_TEXT_ALIGN_RIGHT, 0);
-        lv_label_set_text_fmt(value_label, "%u mL", state->custom_mix_ml[index]);
-        lv_obj_align(value_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-        s_mix_value_label[index] = value_label;
     }
 
     actions = ui_create_action_bar(screen);

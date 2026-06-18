@@ -9,6 +9,7 @@
 #include "ui_metrics.h"
 #include "ui_palette.h"
 #include "ui_styles.h"
+#include "ui_typography.h"
 
 #define UI_RECIPE_SHOWCASE_HEIGHT 248
 #define UI_RECIPE_FOCUS_PANEL_WIDTH 282
@@ -170,8 +171,7 @@ void screen_recipes_create(lv_obj_t *screen)
     lv_obj_t *actions;
     lv_obj_t *showcase;
     lv_obj_t *focus_eyebrow;
-    lv_obj_t *focus_accent;
-    lv_obj_t *focus_line;
+    lv_obj_t *focus_content;
     lv_obj_t *rail_shell;
     size_t index;
 
@@ -210,14 +210,7 @@ void screen_recipes_create(lv_obj_t *screen)
     lv_obj_set_style_bg_grad_color(s_recipe_focus_panel, ui_color_surface_alt(), 0);
     lv_obj_set_style_border_color(s_recipe_focus_panel, ui_color_line(), 0);
 
-    focus_accent = lv_obj_create(s_recipe_focus_panel);
-    lv_obj_remove_style_all(focus_accent);
-    lv_obj_set_size(focus_accent, 3, 94);
-    lv_obj_align(focus_accent, LV_ALIGN_TOP_RIGHT, -4, 30);
-    lv_obj_set_style_radius(focus_accent, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_bg_color(focus_accent, ui_color_accent(), 0);
-    lv_obj_set_style_bg_opa(focus_accent, LV_OPA_COVER, 0);
-
+    /* Eyebrow row: "SÉLECTION" left, position counter right — anchored at top of panel */
     focus_eyebrow = lv_label_create(s_recipe_focus_panel);
     lv_obj_add_style(focus_eyebrow, ui_style_overline(), 0);
     lv_label_set_text(focus_eyebrow, "SÉLECTION");
@@ -229,49 +222,54 @@ void screen_recipes_create(lv_obj_t *screen)
     lv_label_set_text(s_recipe_position_label, "01 / 01");
     lv_obj_align(s_recipe_position_label, LV_ALIGN_TOP_RIGHT, 0, 0);
 
-    focus_line = lv_obj_create(s_recipe_focus_panel);
-    lv_obj_remove_style_all(focus_line);
-    lv_obj_set_size(focus_line, 48, 2);
-    lv_obj_align(focus_line, LV_ALIGN_TOP_LEFT, 0, 24);
-    lv_obj_set_style_radius(focus_line, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_bg_color(focus_line, ui_color_accent(), 0);
-    lv_obj_set_style_bg_grad_color(focus_line, ui_color_accent_secondary(), 0);
-    lv_obj_set_style_bg_grad_dir(focus_line, LV_GRAD_DIR_HOR, 0);
-    lv_obj_set_style_bg_opa(focus_line, LV_OPA_COVER, 0);
-    lv_obj_set_style_shadow_width(focus_line, 0, 0);
+    /*
+     * Flex column container for the main content (name → tagline → status → meta → swipe).
+     * Placed below the eyebrow row (offset 26px = overline ~19px + 7px gap).
+     * Width = panel width - 2 * pad_all(14) = 282 - 28 = 254.
+     * Height fills remaining panel space: 248 - 14(top pad) - 26 - 14(bot pad) = 194.
+     */
+    focus_content = lv_obj_create(s_recipe_focus_panel);
+    lv_obj_remove_style_all(focus_content);
+    lv_obj_set_size(focus_content, 254, 194);
+    lv_obj_align(focus_content, LV_ALIGN_TOP_LEFT, 0, 26);
+    lv_obj_set_flex_flow(focus_content, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_gap(focus_content, 8, 0);
+    lv_obj_clear_flag(focus_content, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_recipe_name_label = lv_label_create(s_recipe_focus_panel);
+    /* Name: use ui_style_title but override font to semibold 22 to avoid wrap-into-tagline */
+    s_recipe_name_label = lv_label_create(focus_content);
     lv_obj_add_style(s_recipe_name_label, ui_style_title(), 0);
-    lv_obj_set_width(s_recipe_name_label, 220);
-    lv_label_set_long_mode(s_recipe_name_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_style_text_font(s_recipe_name_label, ui_font_title(), 0);
+    lv_obj_set_width(s_recipe_name_label, 250);
+    lv_label_set_long_mode(s_recipe_name_label, LV_LABEL_LONG_DOT);
     lv_label_set_text(s_recipe_name_label, "-");
-    lv_obj_align(s_recipe_name_label, LV_ALIGN_TOP_LEFT, 0, 42);
 
-    s_recipe_tagline_label = lv_label_create(s_recipe_focus_panel);
+    /* Tagline: body style, wraps on 2 lines max via width constraint */
+    s_recipe_tagline_label = lv_label_create(focus_content);
     lv_obj_add_style(s_recipe_tagline_label, ui_style_body(), 0);
-    lv_obj_set_width(s_recipe_tagline_label, 220);
+    lv_obj_set_width(s_recipe_tagline_label, 250);
     lv_label_set_long_mode(s_recipe_tagline_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_style_max_height(s_recipe_tagline_label, 50, 0);
     lv_label_set_text(s_recipe_tagline_label, "-");
-    lv_obj_align_to(s_recipe_tagline_label, s_recipe_name_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 8);
 
-    s_recipe_status_label = lv_label_create(s_recipe_focus_panel);
+    /* Status badge */
+    s_recipe_status_label = lv_label_create(focus_content);
     lv_obj_add_style(s_recipe_status_label, ui_style_badge(), 0);
     lv_label_set_text(s_recipe_status_label, "Prêt à servir");
-    lv_obj_align(s_recipe_status_label, LV_ALIGN_BOTTOM_LEFT, 0, -84);
 
-    s_recipe_meta_label = lv_label_create(s_recipe_focus_panel);
+    /* Meta line */
+    s_recipe_meta_label = lv_label_create(focus_content);
     lv_obj_add_style(s_recipe_meta_label, ui_style_caption(), 0);
-    lv_obj_set_width(s_recipe_meta_label, 220);
+    lv_obj_set_width(s_recipe_meta_label, 250);
     lv_label_set_long_mode(s_recipe_meta_label, LV_LABEL_LONG_WRAP);
     lv_label_set_text(s_recipe_meta_label, "-");
-    lv_obj_align_to(s_recipe_meta_label, s_recipe_status_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 8);
 
-    s_recipe_swipe_label = lv_label_create(s_recipe_focus_panel);
+    /* Swipe hint */
+    s_recipe_swipe_label = lv_label_create(focus_content);
     lv_obj_add_style(s_recipe_swipe_label, ui_style_caption(), 0);
-    lv_obj_set_width(s_recipe_swipe_label, 220);
+    lv_obj_set_width(s_recipe_swipe_label, 250);
     lv_label_set_long_mode(s_recipe_swipe_label, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(s_recipe_swipe_label, "Glisse sur le côté pour parcourir le menu.");
-    lv_obj_align(s_recipe_swipe_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+    lv_label_set_text(s_recipe_swipe_label, "Glisse pour voir les cocktails.");
 
     rail_shell = lv_obj_create(showcase);
     lv_obj_remove_style_all(rail_shell);

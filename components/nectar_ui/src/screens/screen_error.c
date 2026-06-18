@@ -38,22 +38,25 @@ void screen_error_create(lv_obj_t *screen)
     lv_obj_set_style_border_color(card, ui_color_error(), 0);
     lv_obj_set_style_outline_color(card, ui_color_error(), 0);
 
+    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_gap(card, 10, 0);
+    lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
+
     title = lv_label_create(card);
     lv_obj_add_style(title, ui_style_overline(), 0);
     lv_label_set_text(title, "ATTENTION");
-    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     title = lv_label_create(card);
     lv_obj_add_style(title, ui_style_title(), 0);
+    lv_obj_set_width(title, 560);
+    lv_label_set_long_mode(title, LV_LABEL_LONG_WRAP);
     lv_label_set_text(title, state->error_title);
-    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 26);
 
     message = lv_label_create(card);
     lv_obj_add_style(message, ui_style_body(), 0);
     lv_obj_set_width(message, 560);
     lv_label_set_long_mode(message, LV_LABEL_LONG_WRAP);
     lv_label_set_text(message, state->error_message);
-    lv_obj_align(message, LV_ALIGN_TOP_LEFT, 0, 88);
 
     actions = ui_create_action_bar(screen);
     lv_obj_align(ui_create_button(

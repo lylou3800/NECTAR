@@ -7,6 +7,7 @@
 #include "ui_metrics.h"
 #include "ui_palette.h"
 #include "ui_styles.h"
+#include "ui_typography.h"
 #include "ui_state_model.h"
 
 static lv_obj_t *s_admin_machine_value;
@@ -50,21 +51,27 @@ static lv_obj_t *maintenance_create_status_tile(lv_obj_t *parent,
                                                 lv_obj_t **value_label)
 {
     lv_obj_t *tile = lv_obj_create(parent);
-    lv_obj_t *eyebrow = lv_label_create(tile);
-    lv_obj_t *value = lv_label_create(tile);
+    lv_obj_t *eyebrow;
+    lv_obj_t *value;
 
     lv_obj_add_style(tile, ui_style_card_inset(), 0);
     lv_obj_set_size(tile, 236, 124);
+    lv_obj_set_flex_flow(tile, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_gap(tile, 8, 0);
+    lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
 
+    eyebrow = lv_label_create(tile);
     lv_obj_add_style(eyebrow, ui_style_overline(), 0);
+    lv_obj_set_width(eyebrow, 200);
+    lv_label_set_long_mode(eyebrow, LV_LABEL_LONG_DOT);
     lv_label_set_text(eyebrow, label);
-    lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
 
+    value = lv_label_create(tile);
     lv_obj_add_style(value, ui_style_heading(), 0);
+    lv_obj_set_style_text_font(value, ui_font_body(), 0);
     lv_obj_set_width(value, 200);
     lv_label_set_long_mode(value, LV_LABEL_LONG_WRAP);
     lv_label_set_text(value, "--");
-    lv_obj_align(value, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     *value_label = value;
     return tile;
@@ -111,7 +118,7 @@ void screen_maintenance_create(lv_obj_t *screen)
 
     grid = lv_obj_create(screen);
     lv_obj_remove_style_all(grid);
-    lv_obj_set_size(grid, UI_CONTENT_WIDTH, 174);
+    lv_obj_set_size(grid, UI_CONTENT_WIDTH, 196);
     lv_obj_align(grid, LV_ALIGN_TOP_MID, 0, 266);
     lv_obj_set_flex_flow(grid, LV_FLEX_FLOW_ROW);
     lv_obj_set_style_pad_gap(grid, 18, 0);
@@ -121,7 +128,7 @@ void screen_maintenance_create(lv_obj_t *screen)
     for (index = 0; index < drink_model_count(); index++) {
         const drink_model_t *drink = drink_model_at(index);
         lv_obj_t *card = lv_obj_create(grid);
-        lv_obj_t *accent;
+        lv_obj_t *inner;
         lv_obj_t *eyebrow;
         lv_obj_t *name;
         lv_obj_t *percent;
@@ -130,51 +137,55 @@ void screen_maintenance_create(lv_obj_t *screen)
         const uint8_t level = app_services_reservoir_level(index);
 
         lv_obj_add_style(card, ui_style_card(), 0);
-        lv_obj_set_size(card, 236, 174);
+        lv_obj_set_size(card, 236, 196);
         lv_obj_set_style_bg_color(card, ui_color_surface(), 0);
         lv_obj_set_style_bg_grad_color(card, ui_color_surface_alt(), 0);
+        lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
 
-        accent = lv_obj_create(card);
-        lv_obj_remove_style_all(accent);
-        lv_obj_set_size(accent, 3, 76);
-        lv_obj_align(accent, LV_ALIGN_TOP_RIGHT, -4, 28);
-        lv_obj_set_style_radius(accent, LV_RADIUS_CIRCLE, 0);
-        lv_obj_set_style_bg_color(accent, level <= 30U ? ui_color_warning() : ui_color_accent_secondary(), 0);
-        lv_obj_set_style_bg_opa(accent, LV_OPA_COVER, 0);
+        /* Flex column inner container — auto-stacks labels without overlap */
+        inner = lv_obj_create(card);
+        lv_obj_remove_style_all(inner);
+        lv_obj_set_size(inner, LV_PCT(100), LV_SIZE_CONTENT);
+        lv_obj_set_flex_flow(inner, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_style_pad_gap(inner, 6, 0);
+        lv_obj_set_style_pad_all(inner, 0, 0);
+        lv_obj_clear_flag(inner, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_align(inner, LV_ALIGN_TOP_LEFT, 0, 0);
 
-        eyebrow = lv_label_create(card);
+        eyebrow = lv_label_create(inner);
         lv_obj_add_style(eyebrow, ui_style_overline(), 0);
+        lv_obj_set_width(eyebrow, 200);
+        lv_label_set_long_mode(eyebrow, LV_LABEL_LONG_DOT);
         lv_label_set_text_fmt(eyebrow, "TANK %c", (int)('A' + (char)index));
-        lv_obj_align(eyebrow, LV_ALIGN_TOP_LEFT, 0, 0);
 
-        name = lv_label_create(card);
+        name = lv_label_create(inner);
         lv_obj_add_style(name, ui_style_heading(), 0);
         lv_obj_set_style_text_color(name, ui_color_text_primary(), 0);
-        lv_obj_set_width(name, 188);
+        lv_obj_set_width(name, 200);
         lv_label_set_long_mode(name, LV_LABEL_LONG_DOT);
         lv_label_set_text(name, drink->name);
-        lv_obj_align(name, LV_ALIGN_TOP_LEFT, 0, 24);
 
-        percent = lv_label_create(card);
+        percent = lv_label_create(inner);
         lv_obj_add_style(percent, ui_style_title(), 0);
+        /* Override display-size font with a smaller title font to fit the card */
+        lv_obj_set_style_text_font(percent, ui_font_title(), 0);
+        lv_obj_set_width(percent, 200);
+        lv_label_set_long_mode(percent, LV_LABEL_LONG_DOT);
         lv_label_set_text_fmt(percent, "%u%%", level);
-        lv_obj_align(percent, LV_ALIGN_TOP_LEFT, 0, 56);
         s_admin_reservoir_percent[index] = percent;
 
-        state = lv_label_create(card);
+        state = lv_label_create(inner);
         lv_obj_add_style(state, ui_style_heading(), 0);
-        lv_obj_set_width(state, 188);
+        lv_obj_set_width(state, 200);
         lv_label_set_long_mode(state, LV_LABEL_LONG_WRAP);
         lv_label_set_text(state, level <= 30U ? "Recharge critique" : "Niveau correct");
-        lv_obj_align(state, LV_ALIGN_TOP_LEFT, 0, 102);
         s_admin_reservoir_state[index] = state;
 
-        hint = lv_label_create(card);
+        hint = lv_label_create(inner);
         lv_obj_add_style(hint, level <= 30U ? ui_style_banner_warning() : ui_style_banner(), 0);
-        lv_obj_set_width(hint, 188);
+        lv_obj_set_width(hint, 200);
         lv_label_set_long_mode(hint, LV_LABEL_LONG_WRAP);
         lv_label_set_text_fmt(hint, level <= 30U ? "À recharger." : "OK pour le service.");
-        lv_obj_align(hint, LV_ALIGN_BOTTOM_LEFT, 0, 0);
         s_admin_reservoir_label[index] = hint;
     }
 

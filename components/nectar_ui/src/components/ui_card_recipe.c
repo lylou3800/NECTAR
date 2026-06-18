@@ -156,6 +156,13 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
         lv_obj_center(monogram);
     }
 
+    /*
+     * Text block: title + subtitle + footer chained top-to-bottom.
+     * media_shell bottom = content_y 120 (pad_all 16 already excluded).
+     * title starts at content_y 126 (6px gap after media).
+     * heading ~24px → bottom 150; subtitle 6px gap → 156, caption ~19px → 175;
+     * footer 6px gap → 181, caption ~19px → 200 ≤ content height 204. No overlap.
+     */
     title = lv_label_create(button);
     lv_obj_add_style(title, ui_style_heading(), 0);
     lv_obj_set_style_text_color(title, recipe->available ? ui_color_text_primary() : ui_color_text_secondary(), 0);
@@ -163,7 +170,7 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
     lv_label_set_long_mode(title, LV_LABEL_LONG_DOT);
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(title, recipe->name);
-    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 132);
+    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 126);
 
     subtitle = lv_label_create(button);
     lv_obj_add_style(subtitle, ui_style_caption(), 0);
@@ -191,7 +198,7 @@ lv_obj_t *ui_card_recipe_create(lv_obj_t *parent,
         recipe->ingredient_count,
         recipe->ingredient_count > 1U ? "s" : ""
     );
-    lv_obj_align(footer, LV_ALIGN_BOTTOM_MID, 0, -4);
+    lv_obj_align_to(footer, subtitle, LV_ALIGN_OUT_BOTTOM_MID, 0, 6);
 
     return button;
 }

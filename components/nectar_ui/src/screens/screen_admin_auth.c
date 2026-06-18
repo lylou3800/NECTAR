@@ -8,6 +8,7 @@
 #include "ui_metrics.h"
 #include "ui_palette.h"
 #include "ui_styles.h"
+#include "ui_typography.h"
 #include "ui_state_model.h"
 
 static lv_obj_t *s_pin_dots;
@@ -125,25 +126,26 @@ void screen_admin_auth_create(lv_obj_t *screen)
 
     pin_card = lv_obj_create(shell);
     lv_obj_add_style(pin_card, ui_style_card_inset(), 0);
-    lv_obj_set_size(pin_card, 286, 132);
+    lv_obj_set_size(pin_card, 286, LV_SIZE_CONTENT);
     lv_obj_align(pin_card, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     lv_obj_set_style_bg_color(pin_card, ui_color_surface_overlay(), 0);
+    lv_obj_set_flex_flow(pin_card, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_gap(pin_card, 8, 0);
+    lv_obj_clear_flag(pin_card, LV_OBJ_FLAG_SCROLLABLE);
 
     title = lv_label_create(pin_card);
     lv_obj_add_style(title, ui_style_overline(), 0);
     lv_label_set_text(title, "CODE");
-    lv_obj_align(title, LV_ALIGN_TOP_LEFT, 0, 0);
 
     s_pin_dots = lv_label_create(pin_card);
     lv_obj_add_style(s_pin_dots, ui_style_title(), 0);
+    lv_obj_set_style_text_font(s_pin_dots, ui_font_title(), 0);
     lv_label_set_text(s_pin_dots, "_ _ _ _");
-    lv_obj_align(s_pin_dots, LV_ALIGN_CENTER, 0, -8);
 
     s_status_label = lv_label_create(pin_card);
     lv_obj_add_style(s_status_label, ui_style_caption(), 0);
     lv_obj_set_width(s_status_label, 230);
     lv_label_set_long_mode(s_status_label, LV_LABEL_LONG_WRAP);
-    lv_obj_align(s_status_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     keypad = lv_obj_create(shell);
     lv_obj_remove_style_all(keypad);
