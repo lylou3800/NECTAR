@@ -6,6 +6,7 @@
 #include "board_display.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
+#include "esp_attr.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "lvgl.h"
@@ -210,7 +211,7 @@ void lvgl_port_unlock(void)
     }
 }
 
-bool lvgl_port_notify_rgb_vsync(void)
+IRAM_ATTR bool lvgl_port_notify_rgb_vsync(void)
 {
     BaseType_t need_yield = pdFALSE;
 
