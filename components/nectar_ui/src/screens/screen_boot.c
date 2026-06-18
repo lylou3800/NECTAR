@@ -11,27 +11,23 @@ static lv_obj_t *s_loading_value;
 
 void screen_boot_create(lv_obj_t *screen)
 {
-    /* --- MIRE DIAGNOSTIC COULEUR (temporaire, retirée au Step 6) --- */
-    lv_obj_t *mire_r = lv_obj_create(screen);
-    lv_obj_remove_style_all(mire_r);
-    lv_obj_set_size(mire_r, 800, 60);
-    lv_obj_align(mire_r, LV_ALIGN_TOP_MID, 0, 0);
-    lv_obj_set_style_bg_color(mire_r, lv_color_hex(0xFF0000), 0); /* doit être ROUGE */
-    lv_obj_set_style_bg_opa(mire_r, LV_OPA_COVER, 0);
-
-    lv_obj_t *mire_g = lv_obj_create(screen);
-    lv_obj_remove_style_all(mire_g);
-    lv_obj_set_size(mire_g, 800, 60);
-    lv_obj_align(mire_g, LV_ALIGN_TOP_MID, 0, 60);
-    lv_obj_set_style_bg_color(mire_g, lv_color_hex(0x00FF00), 0); /* doit être VERT */
-    lv_obj_set_style_bg_opa(mire_g, LV_OPA_COVER, 0);
-
-    lv_obj_t *mire_b = lv_obj_create(screen);
-    lv_obj_remove_style_all(mire_b);
-    lv_obj_set_size(mire_b, 800, 60);
-    lv_obj_align(mire_b, LV_ALIGN_TOP_MID, 0, 120);
-    lv_obj_set_style_bg_color(mire_b, lv_color_hex(0x0000FF), 0); /* doit être BLEU */
-    lv_obj_set_style_bg_opa(mire_b, LV_OPA_COVER, 0);
+    /* --- MIRE DIAGNOSTIC COULEUR (temporaire) : le libellé (texte NOIR, invariant
+     *     au swap R/B) indique la couleur ATTENDUE de la bande ; on compare à la
+     *     couleur réellement affichée. --- */
+    static const uint32_t mire_colors[3] = {0xFF0000, 0x00FF00, 0x0000FF};
+    static const char *const mire_labels[3] = {"ROUGE", "VERT", "BLEU"};
+    for (int mire_i = 0; mire_i < 3; mire_i++) {
+        lv_obj_t *bar = lv_obj_create(screen);
+        lv_obj_remove_style_all(bar);
+        lv_obj_set_size(bar, 800, 60);
+        lv_obj_align(bar, LV_ALIGN_TOP_MID, 0, (lv_coord_t)(mire_i * 60));
+        lv_obj_set_style_bg_color(bar, lv_color_hex(mire_colors[mire_i]), 0);
+        lv_obj_set_style_bg_opa(bar, LV_OPA_COVER, 0);
+        lv_obj_t *bar_label = lv_label_create(bar);
+        lv_label_set_text(bar_label, mire_labels[mire_i]);
+        lv_obj_set_style_text_color(bar_label, lv_color_hex(0x000000), 0);
+        lv_obj_center(bar_label);
+    }
     /* --- FIN MIRE --- */
 
     lv_obj_t *content = lv_obj_create(screen);
